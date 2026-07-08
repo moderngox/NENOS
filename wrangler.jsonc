@@ -1,5 +1,7 @@
 {
-  "name": "nenos22",
-  "main": "src/index.ts",
-  "compatibility_date": "2026-07-08"
+  "name": "nenos23",
+  "compatibility_date": "2026-07-08",
+  "assets": {
+    "directory": "./dist"
+  }
 }
