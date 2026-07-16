@@ -12,6 +12,7 @@ import { OrderDetail } from './pages/OrderDetail';
 import { BookReader } from './pages/BookReader';
 import { Login } from './pages/Login';
 import { Examples } from './pages/Examples';
+import { ExampleReader } from './pages/ExampleReader';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
               <Route path="/livre/:bookId" element={<BookReader />} />
               <Route path="/connexion" element={<Login />} />
               <Route path="/exemples" element={<Examples />} />
+              <Route path="/exemples/:slug" element={<ExampleReader />} />
             </Routes>
           </BrowserRouter>
         </BookDraftProvider>

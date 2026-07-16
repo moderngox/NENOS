@@ -7,6 +7,12 @@ export interface Strings {
     intro: string;
     bookTitle: string;
     bookSubtitle: string;
+    styleLabel: string;
+    universeLabel: string;
+    bookStyle: string;
+    bookUniverse: string;
+    readCta: string;
+    backToList: string;
   };
   landing: {
     headline: string;
@@ -215,6 +221,12 @@ export const fr: Strings = {
     intro: 'Un aperçu du style Kiddoverse, avec Léa dans sa propre aventure sous les étoiles.',
     bookTitle: 'Léa et le Dragon des Étoiles',
     bookSubtitle: 'Une aventure sous les étoiles',
+    styleLabel: 'Style graphique',
+    universeLabel: 'Univers',
+    bookStyle: 'Comic à effet demi-ton',
+    bookUniverse: 'Ciel étoilé nocturne',
+    readCta: 'Lire →',
+    backToList: '← Tous les exemples',
   },
   landing: {
     headline: 'Le livre où TON enfant est le héros ★',
@@ -501,6 +513,12 @@ export const en: Strings = {
     intro: 'A look at the Kiddoverse style, starring Lea in her own night-sky adventure.',
     bookTitle: 'Lea and the Dragon of the Stars',
     bookSubtitle: 'An adventure under the stars',
+    styleLabel: 'Graphic style',
+    universeLabel: 'Universe',
+    bookStyle: 'Halftone comic',
+    bookUniverse: 'Starry night sky',
+    readCta: 'Read →',
+    backToList: '← All examples',
   },
   landing: {
     headline: 'The book where YOUR child is the hero ★',

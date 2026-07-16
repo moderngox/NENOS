@@ -1,26 +1,10 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { useLanguage } from '../context/LanguageContext';
-
-const BASE = '/exemples/lea-dragon-etoiles';
-const PAGE_COUNT = 10;
-const TOTAL_SLIDES = PAGE_COUNT + 2; // front cover + pages + back cover
-
-// Most pages were compressed to .jpg; the two reused pre-existing marketing
-// assets (cover, page 2) failed to re-encode and were kept as their
-// original .png — see poc-imagegen/compress-lea-images.mjs.
-function slideUrl(slide: number): string {
-  if (slide === 0) return `${BASE}/00-cover-front.png`;
-  if (slide === 2) return `${BASE}/02.png`;
-  if (slide === TOTAL_SLIDES - 1) return `${BASE}/${PAGE_COUNT + 1}-cover-back.jpg`;
-  return `${BASE}/${String(slide).padStart(2, '0')}.jpg`;
-}
+import { exampleBooks } from '../data/exampleBooks';
 
 export function Examples() {
   const { t } = useLanguage();
-  const [slide, setSlide] = useState(0);
-  const isFront = slide === 0;
-  const isBack = slide === TOTAL_SLIDES - 1;
 
   return (
     <div className="screen">
@@ -31,82 +15,61 @@ export function Examples() {
         </div>
         <p style={{ font: '600 14px Geist', color: 'var(--muted)', marginBottom: 24 }}>{t.examplesPage.intro}</p>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-          <span style={{ font: '700 13px Geist', color: 'var(--muted)' }}>
-            {isFront ? t.reader.frontCoverLabel : isBack ? t.reader.backCoverLabel : t.reader.pageLabel(slide, PAGE_COUNT)}
-          </span>
-          <a
-            href={`${BASE}/lea-et-le-dragon-des-etoiles.pdf`}
-            className="cta-secondary"
-            style={{ width: 'auto', padding: '8px 16px', fontSize: 13 }}
-          >
-            {t.account.downloadPdf}
-          </a>
-        </div>
-
-        <div
-          style={{
-            border: '1px solid var(--border)',
-            borderRadius: 16,
-            overflow: 'hidden',
-            boxShadow: '0 16px 40px rgba(0,0,0,.16)',
-            background: '#fff',
-          }}
-        >
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '2 / 3', backgroundColor: '#f4f4f4' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {exampleBooks.map((book) => (
             <div
+              key={book.slug}
               style={{
-                position: 'absolute',
-                inset: 0,
-                backgroundImage: `url(${slideUrl(slide)})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 16,
+                padding: 16,
+                border: '1px solid var(--border)',
+                borderRadius: 14,
+                background: '#fff',
+                flexWrap: 'wrap',
               }}
-            />
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 18 }}>
-          <button
-            type="button"
-            className="cta-secondary"
-            style={{ width: 'auto', padding: '10px 18px' }}
-            onClick={() => setSlide((s) => Math.max(s - 1, 0))}
-            disabled={slide === 0}
-          >
-            {t.reader.prev}
-          </button>
-
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
-            {Array.from({ length: TOTAL_SLIDES }, (_, i) => (
-              <button
-                key={i}
-                type="button"
-                aria-label={`Slide ${i + 1}`}
-                onClick={() => setSlide(i)}
+            >
+              <div
                 style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  border: 'none',
-                  padding: 0,
-                  background: i === slide ? 'var(--ink)' : 'var(--border)',
-                  cursor: 'pointer',
+                  width: 64,
+                  height: 96,
+                  flex: 'none',
+                  borderRadius: 8,
+                  border: '1px solid var(--border)',
+                  backgroundImage: `url(${book.coverUrl})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
                 }}
               />
-            ))}
-          </div>
 
-          <button
-            type="button"
-            className="cta-secondary"
-            style={{ width: 'auto', padding: '10px 18px' }}
-            onClick={() => setSlide((s) => Math.min(s + 1, TOTAL_SLIDES - 1))}
-            disabled={slide === TOTAL_SLIDES - 1}
-          >
-            {t.reader.next}
-          </button>
+              <div style={{ flex: '1 1 220px', minWidth: 180 }}>
+                <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 16, color: 'var(--ink)', marginBottom: 4 }}>
+                  {t.examplesPage.bookTitle}
+                </div>
+                <div style={{ font: '600 12px Geist', color: 'var(--muted)' }}>{t.examplesPage.bookSubtitle}</div>
+              </div>
+
+              <div style={{ flex: '1 1 140px', minWidth: 120 }}>
+                <div style={{ font: '700 10px Geist', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 2 }}>
+                  {t.examplesPage.styleLabel}
+                </div>
+                <div style={{ font: '600 13px Geist', color: 'var(--ink)' }}>{t.examplesPage.bookStyle}</div>
+              </div>
+
+              <div style={{ flex: '1 1 140px', minWidth: 120 }}>
+                <div style={{ font: '700 10px Geist', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 2 }}>
+                  {t.examplesPage.universeLabel}
+                </div>
+                <div style={{ font: '600 13px Geist', color: 'var(--ink)' }}>{t.examplesPage.bookUniverse}</div>
+              </div>
+
+              <Link to={`/exemples/${book.slug}`} className="cta" style={{ width: 'auto', padding: '10px 22px', flex: 'none' }}>
+                {t.examplesPage.readCta}
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
     </div>
