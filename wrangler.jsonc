@@ -1,30 +1,25 @@
 {
-  "name": "nenos23",
-  "compatibility_date": "2026-07-08",
-  "main": "worker/index.ts",
-  "assets": {
-    "directory": "./dist",
-    "binding": "ASSETS",
-    // Without this, a direct/refreshed request to a client-side route like
-    // /creer 404s instead of serving index.html for React Router to handle.
-    "not_found_handling": "single-page-application"
-  },
-  "d1_databases": [
-    {
-      "binding": "DB",
-      // Placeholder for local `wrangler dev` emulation only. Real deployment
-      // needs `wrangler login` then `wrangler d1 create nenos-books`, and
-      // this database_id replaced with the real one it prints.
-      "database_name": "nenos-books-local",
-      "database_id": "local-dev-placeholder"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "PHOTOS",
-      // Same story as above: real deployment needs
-      // `wrangler r2 bucket create nenos-photos-local` (or the real name).
-      "bucket_name": "nenos-photos-local"
-    }
-  ]
+	"name": "nenos23",
+	"compatibility_date": "2026-07-08",
+	"main": "worker/index.ts",
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS",
+		// Without this, a direct/refreshed request to a client-side route like
+		// /creer 404s instead of serving index.html for React Router to handle.
+		"not_found_handling": "single-page-application"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "nenos-books",
+			"database_id": "6cde5872-e8e5-46b8-b69b-0fe554e0b992"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "PHOTOS",
+			"bucket_name": "nenos-photos"
+		}
+	]
 }
