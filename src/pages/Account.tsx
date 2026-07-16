@@ -137,8 +137,9 @@ export function Account() {
                       ? { background: '#fde2e2', color: '#b3261e' }
                       : { background: 'var(--gray-bg)', color: 'var(--muted)' };
                 return (
-                  <div
+                  <Link
                     key={book.bookId}
+                    to={`/mon-compte/commandes/${book.bookId}`}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -149,6 +150,9 @@ export function Account() {
                       border: '1px solid var(--border)',
                       borderRadius: 12,
                       background: '#fff',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      cursor: 'pointer',
                     }}
                   >
                     <div>
@@ -159,17 +163,22 @@ export function Account() {
                         {book.priceCents != null && ` · ${formatPrice(book.priceCents, lang)}`}
                       </div>
                     </div>
-                    <span
-                      style={{
-                        font: '700 11px Geist',
-                        padding: '5px 12px',
-                        borderRadius: 999,
-                        ...statusColor,
-                      }}
-                    >
-                      {statusLabel}
-                    </span>
-                  </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span
+                        style={{
+                          font: '700 11px Geist',
+                          padding: '5px 12px',
+                          borderRadius: 999,
+                          ...statusColor,
+                        }}
+                      >
+                        {statusLabel}
+                      </span>
+                      <span style={{ color: 'var(--muted)', fontSize: 16 }} aria-hidden="true">
+                        ›
+                      </span>
+                    </div>
+                  </Link>
                 );
               })}
             </div>

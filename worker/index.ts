@@ -8,6 +8,7 @@ import { handleGetBookStatus } from "./routes/book-status";
 import { handleGetPdf } from "./routes/pdf";
 import { handleSignup, handleLogin, handleLogout, handleMe } from "./routes/auth";
 import { handleGetMyBooks } from "./routes/me-books";
+import { handleGetOrderDetail } from "./routes/order-detail";
 import { handleOAuthStart, handleOAuthCallback } from "./routes/oauth";
 import { handleScheduled } from "./scheduled";
 
@@ -42,6 +43,11 @@ export default {
     }
     if (url.pathname === "/api/me/books" && request.method === "GET") {
       return handleGetMyBooks(request, env);
+    }
+
+    // /api/me/orders/:bookId
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "me" && parts[2] === "orders" && request.method === "GET") {
+      return handleGetOrderDetail(parts[3], request, env);
     }
 
     // /api/auth/:provider/start and /api/auth/:provider/callback

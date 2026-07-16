@@ -184,6 +184,22 @@ export interface Strings {
     preparing: (done: number, total: number) => string;
     logout: string;
   };
+  orderDetail: {
+    back: string;
+    title: string;
+    dateLabel: string;
+    formatLabel: string;
+    priceLabel: string;
+    paymentStatusLabel: string;
+    cardLabel: string;
+    cardValue: (brand: string, last4: string) => string;
+    noCardInfo: string;
+    bookStatusLabel: string;
+    bookStatusReady: string;
+    bookStatusInProgress: (done: number, total: number) => string;
+    orderIdLabel: string;
+    notFound: string;
+  };
 }
 
 export const fr: Strings = {
@@ -448,6 +464,22 @@ export const fr: Strings = {
     preparing: (done, total) => `En préparation — ${done}/${total}`,
     logout: 'Se déconnecter',
   },
+  orderDetail: {
+    back: '← Retour à mes commandes',
+    title: 'Détails de la commande',
+    dateLabel: 'Date',
+    formatLabel: 'Format',
+    priceLabel: 'Prix',
+    paymentStatusLabel: 'Statut du paiement',
+    cardLabel: 'Moyen de paiement',
+    cardValue: (brand, last4) => `${brand} •••• ${last4}`,
+    noCardInfo: 'Non disponible',
+    bookStatusLabel: 'Statut du livre',
+    bookStatusReady: '✓ Prêt',
+    bookStatusInProgress: (done, total) => `En préparation — ${done}/${total}`,
+    orderIdLabel: 'Référence',
+    notFound: 'Commande introuvable.',
+  },
 };
 
 export const en: Strings = {
@@ -710,6 +742,22 @@ export const en: Strings = {
     comingSoon: 'Coming soon',
     preparing: (done, total) => `Preparing — ${done}/${total}`,
     logout: 'Log out',
+  },
+  orderDetail: {
+    back: '← Back to my orders',
+    title: 'Order details',
+    dateLabel: 'Date',
+    formatLabel: 'Format',
+    priceLabel: 'Price',
+    paymentStatusLabel: 'Payment status',
+    cardLabel: 'Payment method',
+    cardValue: (brand, last4) => `${brand} •••• ${last4}`,
+    noCardInfo: 'Not available',
+    bookStatusLabel: 'Book status',
+    bookStatusReady: '✓ Ready',
+    bookStatusInProgress: (done, total) => `Preparing — ${done}/${total}`,
+    orderIdLabel: 'Reference',
+    notFound: 'Order not found.',
   },
 };
 
