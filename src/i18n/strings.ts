@@ -2,6 +2,12 @@ export type Lang = 'fr' | 'en';
 
 export interface Strings {
   nav: { how: string; examples: string; pricing: string; myBooks: string; account: string };
+  examplesPage: {
+    title: string;
+    intro: string;
+    bookTitle: string;
+    bookSubtitle: string;
+  };
   landing: {
     headline: string;
     subtitle: string;
@@ -204,6 +210,12 @@ export interface Strings {
 
 export const fr: Strings = {
   nav: { how: 'Comment ça marche', examples: 'Exemples', pricing: 'Tarifs', myBooks: 'Mes livres', account: 'Compte' },
+  examplesPage: {
+    title: 'Exemples de livres',
+    intro: 'Un aperçu du style Kiddoverse, avec Léa dans sa propre aventure sous les étoiles.',
+    bookTitle: 'Léa et le Dragon des Étoiles',
+    bookSubtitle: 'Une aventure sous les étoiles',
+  },
   landing: {
     headline: 'Le livre où TON enfant est le héros ★',
     subtitle:
@@ -484,6 +496,12 @@ export const fr: Strings = {
 
 export const en: Strings = {
   nav: { how: 'How it works', examples: 'Examples', pricing: 'Pricing', myBooks: 'My books', account: 'Account' },
+  examplesPage: {
+    title: 'Book examples',
+    intro: 'A look at the Kiddoverse style, starring Lea in her own night-sky adventure.',
+    bookTitle: 'Lea and the Dragon of the Stars',
+    bookSubtitle: 'An adventure under the stars',
+  },
   landing: {
     headline: 'The book where YOUR child is the hero ★',
     subtitle:

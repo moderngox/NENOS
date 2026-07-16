@@ -74,7 +74,9 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
           }}
         >
           <span>{t.nav.how}</span>
-          <span>{t.nav.examples}</span>
+          <Link to="/exemples" style={{ color: 'inherit' }}>
+            {t.nav.examples}
+          </Link>
           <span>{t.nav.pricing}</span>
         </nav>
       )}
