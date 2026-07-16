@@ -13,8 +13,8 @@ const UNIVERSE_IMAGES: Record<string, string> = {
 };
 
 const STYLE_IMAGES: Record<string, string> = {
-  pixar: '/exemples/lea-dragon-etoiles/05.jpg',
-  comic: heroChild,
+  pixar: heroChild,
+  comic: '/exemples/lea-dragon-etoiles/05.jpg',
   manhwa: '/style-thumbnails/manhwa.png',
 };
 
