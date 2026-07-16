@@ -19,6 +19,7 @@ const UNIVERSE_IMAGES: Record<string, string> = {
 const STYLE_IMAGES: Record<string, string> = {
   pixar: heroChild,
   comic: '/exemples/lea-dragon-etoiles/05.jpg',
+  manhwa: '/style-thumbnails/manhwa.png',
 };
 
 export function StepTraits() {

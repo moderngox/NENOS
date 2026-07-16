@@ -35,7 +35,7 @@ function parseDraft(raw: unknown): BookDraftInput {
     age: Number(d.age),
     traits: Array.isArray(d.traits) ? d.traits.map(String) : [],
     universe: String(d.universe),
-    style: d.style === "comic" ? "comic" : "pixar",
+    style: d.style === "comic" || d.style === "manhwa" ? d.style : "pixar",
     storyPrompt: String(d.storyPrompt),
     skinColor: typeof d.skinColor === "string" ? d.skinColor : null,
     hairColor: typeof d.hairColor === "string" ? d.hairColor : null,

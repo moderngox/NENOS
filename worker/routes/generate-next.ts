@@ -101,6 +101,7 @@ export async function generateNextUnit(bookId: string, env: Env): Promise<Genera
           universe,
           traits,
           hasPhoto: Boolean(photoInput),
+          style: book.draft.style,
         }),
         images: photoInput ? [photoInput] : [],
         size: CHARACTER_SIZE,

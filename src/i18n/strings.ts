@@ -276,6 +276,7 @@ export const fr: Strings = {
       styles: [
         { id: 'pixar', label: 'Animation premium' },
         { id: 'comic', label: 'Comic demi-ton' },
+        { id: 'manhwa', label: 'Manhwa' },
       ],
     },
     step4: {
@@ -572,6 +573,7 @@ export const en: Strings = {
       styles: [
         { id: 'pixar', label: 'Premium animation' },
         { id: 'comic', label: 'Halftone comic' },
+        { id: 'manhwa', label: 'Manhwa' },
       ],
     },
     step4: {

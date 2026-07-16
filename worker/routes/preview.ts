@@ -103,6 +103,7 @@ export async function handleGeneratePreview(bookId: string, env: Env): Promise<R
         universe,
         traits,
         hasPhoto: Boolean(photoInput),
+        style: book.draft.style,
       }),
       images: photoInput ? [photoInput] : [],
       size: CHARACTER_SIZE,

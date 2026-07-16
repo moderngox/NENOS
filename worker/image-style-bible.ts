@@ -16,6 +16,25 @@ export const CHARACTER_DESIGN_RULES = `Character design rules: large expressive 
 // color grading changes for the "comic" graphic style.
 export const COMIC_ATMOSPHERE = `Color grading: deep midnight indigo/navy base, vivid magenta-pink and purple mid-tones, warm gold/orange glow reserved for light sources (city windows, magical creatures, stardust, horizon). High contrast, saturated, poster-like — punchier than a calm cinematic grade, but never muddy. Where appropriate, a subtle halftone comic-print dot-pattern overlay in background/atmospheric areas only (skyline silhouettes, sky gradients, haze) — never over the main character's face or skin, which stays smoothly painterly. Stardust and sparkle particles trail behind magical motion.`;
 
+// Ported from poc-imagegen/style-bible-manhwa.mjs. Unlike the "comic"
+// variant, this one changes the character's own line rendering (bold ink
+// outlines, chiaroscuro lighting, screentone shading) — not just the
+// environment — so it replaces STYLE_CORE/CHARACTER_DESIGN_RULES entirely
+// rather than layering on top of them.
+export const MANHWA_STYLE_CORE = `Bold Korean webtoon/manhwa-inspired ink illustration. Clean, confident black linework defining every silhouette and major interior form, variable line weight — heavier outer contour, finer interior detail. Dramatic single-source directional lighting producing a graphic, sharply-edged core shadow (chiaroscuro), not soft ambient cinematic falloff. Cross-hatching and fine parallel line texture for shadow mid-tones. Glossy, rounded specular highlights on hair strands and in the eyes, anime-influenced. Rich, slightly desaturated color palette overall, with more vivid saturation reserved for the character against a cooler, textured background. Subtle halftone/screentone dot-pattern shading in background and shadow areas. High contrast, graphic, poster-like. Camera language favors bold, graphic compositions — dramatic close-ups, low angles, or dynamic diagonals.`;
+
+export const MANHWA_CHARACTER_RULES = `Character design rules: large expressive eyes with sharp glossy catch-light highlights, confident ink-drawn eyebrows, appealing stylized (not photorealistic) proportions, clean bold ink outline around the entire figure, one consistent hairstyle rendered with confident flowing linework, one consistent outfit throughout.`;
+
+function styleCore(style: string): string {
+  return style === "manhwa" ? MANHWA_STYLE_CORE : STYLE_CORE;
+}
+
+function styleCharacterRules(style: string): string {
+  return style === "manhwa" ? MANHWA_CHARACTER_RULES : CHARACTER_DESIGN_RULES;
+}
+
+// Comic's atmosphere layers on top of STYLE_CORE; manhwa's equivalent
+// treatment is already fully baked into MANHWA_STYLE_CORE above.
 function atmosphereForStyle(style: string): string {
   return style === "comic" ? `\n${COMIC_ATMOSPHERE}\n` : "";
 }
@@ -59,21 +78,22 @@ export function buildCharacterSheetPrompt(params: {
   universe: string;
   traits: string;
   hasPhoto: boolean;
+  style?: string;
 }): string {
-  const { name, age, universe, traits, hasPhoto } = params;
+  const { name, age, universe, traits, hasPhoto, style = "pixar" } = params;
   const likeness = hasPhoto
-    ? `Base the child's likeness — skin tone, hair type and color, face shape — on the attached reference photo, reinterpreted in the Kiddoverse illustrated style. Do not copy the photo photorealistically: stylize it fully into the animated look described below.`
-    : `No reference photo is attached; build the character purely from the trait description below, fully in the Kiddoverse illustrated style.`;
+    ? `Base the child's likeness — skin tone, hair type and color, face shape — on the attached reference photo, reinterpreted in the style described below. Do not copy the photo photorealistically: stylize it fully into the illustrated look described below.`
+    : `No reference photo is attached; build the character purely from the trait description below, fully in the style described below.`;
 
-  return `Generate a full character reference turnaround sheet for a children's storybook protagonist, in the Kiddoverse premium animated style, on a plain neutral studio background. Show three views of the same character at the same scale: front view, three-quarter view, and side view, full body, with consistent lighting across all three.
+  return `Generate a full character reference turnaround sheet for a children's storybook protagonist, on a plain neutral studio background. Show three views of the same character at the same scale: front view, three-quarter view, and side view, full body, with consistent lighting across all three.
 
 Character: ${name}, age ${age}. Traits: ${traits}. Story setting: ${universe}.
 
 ${likeness}
 
-${CHARACTER_DESIGN_RULES}
+${styleCharacterRules(style)}
 
-${STYLE_CORE}
+${styleCore(style)}
 
 ${NEGATIVE_QUALITY}`;
 }
@@ -96,7 +116,7 @@ Scene for this page: ${sceneDescription}.
 ${secondaryCharacterBlock(secondaryCharacters, photoRefIndex)}
 Leave a clear, uncluttered safe zone (upper third or a solid-color corner, whichever composition allows) for narration text and a page-number badge to be added afterward in a separate layout step — do not render any text, letters, numbers or speech bubbles inside the image itself.
 ${atmosphereForStyle(style)}
-${STYLE_CORE}
+${styleCore(style)}
 
 ${NEGATIVE_QUALITY}`;
 }
@@ -118,7 +138,7 @@ Scene: ${scene || defaultScene}.
 ${secondaryCharacterBlock(secondaryCharacters, photoRefIndex)}
 This is a COVER illustration, not an interior story page: make it one bold, striking, iconic image rather than a busy scene. Compose with a clear, open area — typically the upper third of the frame (open sky, canopy gap, or soft atmospheric haze) — reserved for a large title logotype to be added afterward as a separate typography layer. Do not render any text, letters, numbers, logos or watermarks inside the image itself.
 ${atmosphereForStyle(style)}
-${STYLE_CORE}
+${styleCore(style)}
 
 ${NEGATIVE_QUALITY}`;
 }
@@ -134,7 +154,7 @@ Scene: ${scene || defaultScene}.
 
 Leave a large, uncluttered, softly lit area (plain sky, calm water, or soft out-of-focus foliage) reserved for a paragraph of synopsis text to be added afterward as a separate typography layer. Do not render any text, letters, numbers, logos, barcodes or watermarks inside the image itself.
 ${atmosphereForStyle(style)}
-${STYLE_CORE}
+${styleCore(style)}
 
 ${NEGATIVE_QUALITY}`;
 }
