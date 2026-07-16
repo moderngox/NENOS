@@ -20,6 +20,7 @@ export interface BookDraft {
   age: number | null;
   traits: string[];
   universe: string;
+  style: string;
   storyPrompt: string;
   photo: File | null;
   skinColor: string | null;
@@ -34,6 +35,7 @@ const emptyDraft: BookDraft = {
   age: null,
   traits: [],
   universe: 'space',
+  style: 'pixar',
   storyPrompt: '',
   photo: null,
   skinColor: null,
@@ -211,6 +213,7 @@ export function BookDraftProvider({ children }: { children: ReactNode }) {
           age: draft.age,
           traits: draft.traits,
           universe: draft.universe,
+          style: draft.style,
           storyPrompt: draft.storyPrompt,
           skinColor: draft.skinColor,
           hairColor: draft.hairColor,

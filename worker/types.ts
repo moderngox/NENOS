@@ -19,6 +19,7 @@ export interface BookDraftInput {
   age: number;
   traits: string[];
   universe: string;
+  style: string; // 'pixar' | 'comic'
   storyPrompt: string;
   skinColor: string | null;
   hairColor: string | null;

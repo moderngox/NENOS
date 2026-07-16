@@ -10,6 +10,16 @@ export const NEGATIVE_QUALITY = `Do not alter the character's identity, proporti
 
 export const CHARACTER_DESIGN_RULES = `Character design rules: large expressive eyes, appealing proportions, rounded facial forms, rich detailed skin shading, stylized (not photorealistic) anatomy, one consistent hairstyle, one consistent outfit throughout.`;
 
+// Ported from poc-imagegen/style-bible-starlight-comic.mjs. Layered on top of
+// STYLE_CORE/CHARACTER_DESIGN_RULES (kept identical across styles so the
+// character's identity stays consistent) — only the environment/atmosphere
+// color grading changes for the "comic" graphic style.
+export const COMIC_ATMOSPHERE = `Color grading: deep midnight indigo/navy base, vivid magenta-pink and purple mid-tones, warm gold/orange glow reserved for light sources (city windows, magical creatures, stardust, horizon). High contrast, saturated, poster-like — punchier than a calm cinematic grade, but never muddy. Where appropriate, a subtle halftone comic-print dot-pattern overlay in background/atmospheric areas only (skyline silhouettes, sky gradients, haze) — never over the main character's face or skin, which stays smoothly painterly. Stardust and sparkle particles trail behind magical motion.`;
+
+function atmosphereForStyle(style: string): string {
+  return style === "comic" ? `\n${COMIC_ATMOSPHERE}\n` : "";
+}
+
 const UNIVERSES: Record<string, string> = {
   jungle: "a lush jungle: richer layered foliage, god rays through the canopy, soft mist, scattered flowers",
   forest: "a magical forest: layered vegetation, dappled light, drifting magical particles",
@@ -73,10 +83,11 @@ export function buildPagePrompt(params: {
   universe: string;
   pageNumber: number;
   pageCount: number;
+  style?: string;
   secondaryCharacters?: SecondaryCharacterDraft[];
   photoRefIndex?: Map<string, number>;
 }): string {
-  const { sceneDescription, universe, pageNumber, pageCount, secondaryCharacters = [], photoRefIndex } = params;
+  const { sceneDescription, universe, pageNumber, pageCount, style = "pixar", secondaryCharacters = [], photoRefIndex } = params;
   return `Generate ONE single storybook page illustration, using the attached character reference sheet (image #1) as the exact identity, proportions, hairstyle and outfit for the main child protagonist — do not redesign the character in any way. There is exactly one instance of the protagonist in the scene, unless the scene explicitly describes a mirror or water reflection. This is page ${pageNumber} of ${pageCount} of the storybook; keep composition and story logic consistent with a single continuous book.
 
 Environment: ${universeDescription(universe)}.
@@ -84,7 +95,7 @@ Environment: ${universeDescription(universe)}.
 Scene for this page: ${sceneDescription}.
 ${secondaryCharacterBlock(secondaryCharacters, photoRefIndex)}
 Leave a clear, uncluttered safe zone (upper third or a solid-color corner, whichever composition allows) for narration text and a page-number badge to be added afterward in a separate layout step — do not render any text, letters, numbers or speech bubbles inside the image itself.
-
+${atmosphereForStyle(style)}
 ${STYLE_CORE}
 
 ${NEGATIVE_QUALITY}`;
@@ -92,11 +103,12 @@ ${NEGATIVE_QUALITY}`;
 
 export function buildFrontCoverPrompt(params: {
   universe: string;
+  style?: string;
   secondaryCharacters?: SecondaryCharacterDraft[];
   photoRefIndex?: Map<string, number>;
   scene?: string;
 }): string {
-  const { universe, secondaryCharacters = [], photoRefIndex, scene } = params;
+  const { universe, style = "pixar", secondaryCharacters = [], photoRefIndex, scene } = params;
   const defaultScene = `The main protagonist stands in a bold, welcoming hero pose that introduces the story, together with their companion character(s) if any.`;
   return `Generate a single full-bleed children's storybook FRONT COVER illustration, using the attached character reference sheet (image #1) as the exact identity, proportions, hairstyle and outfit for the main child protagonist — do not redesign the character in any way. There is exactly one instance of the protagonist.
 
@@ -105,14 +117,14 @@ Environment: ${universeDescription(universe)}.
 Scene: ${scene || defaultScene}.
 ${secondaryCharacterBlock(secondaryCharacters, photoRefIndex)}
 This is a COVER illustration, not an interior story page: make it one bold, striking, iconic image rather than a busy scene. Compose with a clear, open area — typically the upper third of the frame (open sky, canopy gap, or soft atmospheric haze) — reserved for a large title logotype to be added afterward as a separate typography layer. Do not render any text, letters, numbers, logos or watermarks inside the image itself.
-
+${atmosphereForStyle(style)}
 ${STYLE_CORE}
 
 ${NEGATIVE_QUALITY}`;
 }
 
-export function buildBackCoverPrompt(params: { universe: string; scene?: string }): string {
-  const { universe, scene } = params;
+export function buildBackCoverPrompt(params: { universe: string; style?: string; scene?: string }): string {
+  const { universe, style = "pixar", scene } = params;
   const defaultScene = `A calm, wide establishing view of the same world as the front cover, evoking the story without repeating its central moment. The protagonist may appear small and distant, or be omitted entirely — this is a quiet backdrop, not a character portrait.`;
   return `Generate a single children's storybook BACK COVER illustration.
 
@@ -121,7 +133,7 @@ Environment: ${universeDescription(universe)}.
 Scene: ${scene || defaultScene}.
 
 Leave a large, uncluttered, softly lit area (plain sky, calm water, or soft out-of-focus foliage) reserved for a paragraph of synopsis text to be added afterward as a separate typography layer. Do not render any text, letters, numbers, logos, barcodes or watermarks inside the image itself.
-
+${atmosphereForStyle(style)}
 ${STYLE_CORE}
 
 ${NEGATIVE_QUALITY}`;

@@ -1,0 +1,1 @@
+ALTER TABLE books ADD COLUMN style TEXT NOT NULL DEFAULT 'pixar';

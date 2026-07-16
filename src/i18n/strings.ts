@@ -37,6 +37,8 @@ export interface Strings {
       traits: string[];
       universeTitle: string;
       universes: { id: string; label: string }[];
+      styleTitle: string;
+      styles: { id: string; label: string }[];
     };
     step4: {
       title: string;
@@ -269,6 +271,11 @@ export const fr: Strings = {
         { id: 'pirates', label: 'Pirates' },
         { id: 'space', label: 'Espace' },
         { id: 'forest', label: 'Forêt magique' },
+      ],
+      styleTitle: 'Style graphique',
+      styles: [
+        { id: 'pixar', label: 'Animation premium' },
+        { id: 'comic', label: 'Comic demi-ton' },
       ],
     },
     step4: {
@@ -560,6 +567,11 @@ export const en: Strings = {
         { id: 'pirates', label: 'Pirates' },
         { id: 'space', label: 'Space' },
         { id: 'forest', label: 'Magic forest' },
+      ],
+      styleTitle: 'Graphic style',
+      styles: [
+        { id: 'pixar', label: 'Premium animation' },
+        { id: 'comic', label: 'Halftone comic' },
       ],
     },
     step4: {

@@ -10,10 +10,10 @@ export async function insertDraftBook(
   await db
     .prepare(
       `INSERT INTO books (
-        id, name, age, traits, universe, story_prompt,
+        id, name, age, traits, universe, style, story_prompt,
         appearance_details, skin_color, hair_color, eye_color, secondary_characters,
         language, photo_key, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       bookId,
@@ -21,6 +21,7 @@ export async function insertDraftBook(
       draft.age,
       JSON.stringify(draft.traits),
       draft.universe,
+      draft.style,
       draft.storyPrompt,
       draft.appearanceDetails,
       draft.skinColor,
@@ -59,6 +60,7 @@ interface BookRow {
   age: number;
   traits: string;
   universe: string;
+  style: string;
   story_prompt: string;
   appearance_details: string;
   skin_color: string | null;
@@ -89,6 +91,7 @@ function mapRowToStoredBook(row: BookRow): StoredBook {
     age: row.age,
     traits: JSON.parse(row.traits),
     universe: row.universe,
+    style: row.style,
     storyPrompt: row.story_prompt,
     skinColor: row.skin_color,
     hairColor: row.hair_color,

@@ -4,11 +4,21 @@ import { Chip } from '../../components/Chip';
 import universePirates from '../../assets/universe-pirates.png';
 import universeSpace from '../../assets/universe-space.png';
 import universeForest from '../../assets/universe-forest.png';
+import heroChild from '../../assets/hero-child.png';
 
 const UNIVERSE_IMAGES: Record<string, string> = {
   pirates: universePirates,
   space: universeSpace,
   forest: universeForest,
+};
+
+// The comic thumbnail reuses a genuinely-generated page from the Léa example
+// book (see public/exemples/lea-dragon-etoiles) rather than its cover, which
+// was reused wholesale from the pre-existing (Pixar-style) marketing assets
+// and wouldn't represent this style at all.
+const STYLE_IMAGES: Record<string, string> = {
+  pixar: heroChild,
+  comic: '/exemples/lea-dragon-etoiles/05.jpg',
 };
 
 export function StepTraits() {
@@ -66,6 +76,53 @@ export function StepTraits() {
                 }}
               >
                 {u.label}
+                {selected ? ' ★' : ''}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 24, color: 'var(--ink)', margin: '26px 0 12px' }}>
+        {t.wizard.step3.styleTitle}
+      </div>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {t.wizard.step3.styles.map((s) => {
+          const selected = draft.style === s.id;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => update({ style: s.id })}
+              style={{
+                width: 110,
+                border: selected ? '2px solid var(--ink)' : '1px solid var(--border)',
+                borderRadius: 12,
+                overflow: 'hidden',
+                boxShadow: selected ? '0 2px 8px rgba(0,0,0,.12)' : '0 1px 3px rgba(0,0,0,.06)',
+                background: '#fff',
+                padding: 0,
+                flex: 'none',
+              }}
+            >
+              <div
+                style={{
+                  height: 72,
+                  backgroundImage: `url(${STYLE_IMAGES[s.id]})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
+              <div
+                style={{
+                  padding: 7,
+                  font: '600 12px Geist',
+                  textAlign: 'center',
+                  background: selected ? 'var(--ink)' : 'transparent',
+                  color: selected ? '#fff' : 'var(--ink)',
+                }}
+              >
+                {s.label}
                 {selected ? ' ★' : ''}
               </div>
             </button>
