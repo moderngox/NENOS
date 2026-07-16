@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Header } from '../../components/Header';
 import { Stepper } from '../../components/Stepper';
 import { useLanguage } from '../../context/LanguageContext';
@@ -19,9 +19,18 @@ export function CreateWizard() {
   const { t } = useLanguage();
   const { draft, submit } = useBookDraft();
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
+  const { step: stepParam } = useParams();
+  const requestedStep = Number(stepParam);
+  // Each step gets its own URL/history entry so the browser's native Back
+  // button steps backward through the wizard instead of jumping straight to
+  // whatever page came before /creer.
+  const step = Number.isInteger(requestedStep) && requestedStep >= 1 && requestedStep <= TOTAL_STEPS ? requestedStep : 1;
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (String(step) !== stepParam) navigate(`/creer/${step}`, { replace: true });
+  }, [step, stepParam, navigate]);
 
   const canAdvance = (() => {
     if (step === 1) return draft.name.trim().length > 0;
@@ -31,7 +40,7 @@ export function CreateWizard() {
 
   const goNext = async () => {
     if (step < TOTAL_STEPS) {
-      setStep(step + 1);
+      navigate(`/creer/${step + 1}`);
       return;
     }
     setSubmitError(null);
@@ -47,7 +56,7 @@ export function CreateWizard() {
   };
   const goBack = () => {
     if (submitting) return;
-    if (step > 1) setStep(step - 1);
+    if (step > 1) navigate(`/creer/${step - 1}`);
     else navigate('/');
   };
 

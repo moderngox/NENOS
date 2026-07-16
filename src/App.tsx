@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { BookDraftProvider } from './context/BookDraftContext';
 import { Landing } from './pages/Landing';
@@ -15,7 +15,8 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/creer" element={<CreateWizard />} />
+            <Route path="/creer" element={<Navigate to="/creer/1" replace />} />
+            <Route path="/creer/:step" element={<CreateWizard />} />
             <Route path="/revelation" element={<Revelation />} />
             <Route path="/paiement" element={<Payment />} />
             <Route path="/commande-confirmee" element={<OrderConfirmed />} />
