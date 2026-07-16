@@ -12,13 +12,9 @@ const UNIVERSE_IMAGES: Record<string, string> = {
   forest: universeForest,
 };
 
-// The comic thumbnail reuses a genuinely-generated page from the Léa example
-// book (see public/exemples/lea-dragon-etoiles) rather than its cover, which
-// was reused wholesale from the pre-existing (Pixar-style) marketing assets
-// and wouldn't represent this style at all.
 const STYLE_IMAGES: Record<string, string> = {
-  pixar: heroChild,
-  comic: '/exemples/lea-dragon-etoiles/05.jpg',
+  pixar: '/exemples/lea-dragon-etoiles/05.jpg',
+  comic: heroChild,
   manhwa: '/style-thumbnails/manhwa.png',
 };
 
