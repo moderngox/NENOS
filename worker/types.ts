@@ -71,4 +71,6 @@ export interface StoredBook {
   fullUnitsDone: number;
   userId: string | null;
   stripePaymentIntentId: string | null;
+  format: string | null;
+  createdAt: string;
 }

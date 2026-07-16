@@ -78,12 +78,11 @@ interface BookRow {
   full_units_done: number;
   user_id: string | null;
   stripe_payment_intent_id: string | null;
+  format: string | null;
+  created_at: string;
 }
 
-export async function getBook(db: D1Database, bookId: string): Promise<StoredBook | null> {
-  const row = await db.prepare(`SELECT * FROM books WHERE id = ?`).bind(bookId).first<BookRow>();
-  if (!row) return null;
-
+function mapRowToStoredBook(row: BookRow): StoredBook {
   const draft: BookDraftInput = {
     name: row.name,
     age: row.age,
@@ -116,7 +115,15 @@ export async function getBook(db: D1Database, bookId: string): Promise<StoredBoo
     fullUnitsDone: row.full_units_done,
     userId: row.user_id,
     stripePaymentIntentId: row.stripe_payment_intent_id,
+    format: row.format,
+    createdAt: row.created_at,
   };
+}
+
+export async function getBook(db: D1Database, bookId: string): Promise<StoredBook | null> {
+  const row = await db.prepare(`SELECT * FROM books WHERE id = ?`).bind(bookId).first<BookRow>();
+  if (!row) return null;
+  return mapRowToStoredBook(row);
 }
 
 export async function getBooksForUser(db: D1Database, userId: string): Promise<StoredBook[]> {
@@ -125,39 +132,7 @@ export async function getBooksForUser(db: D1Database, userId: string): Promise<S
     .bind(userId)
     .all<BookRow>();
 
-  return results.map((row) => {
-    const draft: BookDraftInput = {
-      name: row.name,
-      age: row.age,
-      traits: JSON.parse(row.traits),
-      universe: row.universe,
-      storyPrompt: row.story_prompt,
-      skinColor: row.skin_color,
-      hairColor: row.hair_color,
-      eyeColor: row.eye_color,
-      appearanceDetails: row.appearance_details,
-      secondaryCharacters: JSON.parse(row.secondary_characters),
-      language: row.language,
-    };
-    const story: StoryBeatsResult | null =
-      row.pages && row.front_cover && row.back_cover
-        ? { pages: JSON.parse(row.pages), frontCover: JSON.parse(row.front_cover), backCover: JSON.parse(row.back_cover) }
-        : null;
-    return {
-      id: row.id,
-      draft,
-      photoKey: row.photo_key,
-      status: row.status,
-      story,
-      previewStatus: row.preview_status,
-      previewAssets: row.preview_assets ? JSON.parse(row.preview_assets) : null,
-      paymentStatus: row.payment_status,
-      fullStatus: row.full_status,
-      fullUnitsDone: row.full_units_done,
-      userId: row.user_id,
-      stripePaymentIntentId: row.stripe_payment_intent_id,
-    };
-  });
+  return results.map(mapRowToStoredBook);
 }
 
 export async function stampBookUser(db: D1Database, bookId: string, userId: string): Promise<void> {

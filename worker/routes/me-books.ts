@@ -1,5 +1,6 @@
 import { getBooksForUser } from "../db";
 import { getSessionUser, isPaymentUnlocked } from "../auth";
+import { PRICES_CENTS } from "../pricing";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -19,7 +20,11 @@ export async function handleGetMyBooks(request: Request, env: Env): Promise<Resp
       bookId: book.id,
       title: book.story?.frontCover.title ?? book.draft.name,
       coverUrl: book.fullStatus === "ready" ? `/api/books/${book.id}/full-assets/cover-front.png` : book.previewAssets ? `/api/books/${book.id}/assets/${book.previewAssets.coverFront}` : null,
+      paymentStatus: book.paymentStatus,
       paymentUnlocked: isPaymentUnlocked(book.paymentStatus),
+      format: book.format,
+      priceCents: book.format ? PRICES_CENTS[book.format] ?? null : null,
+      createdAt: book.createdAt,
       fullStatus: book.fullStatus,
       fullUnitsDone: book.fullUnitsDone,
       fullUnitsTotal: (book.story?.pages.length ?? 10) + 3,

@@ -1,13 +1,6 @@
 import { getBook, markBookCheckoutStarted, stampBookUser } from "../db";
 import { getSessionUser } from "../auth";
-
-// EUR only for now — the UI shows a €/$ symbol per language but never
-// actually converts currency; unifying on EUR for the real charge is a
-// deliberate simplification (see plan). Amounts in cents.
-const PRICES_CENTS: Record<string, number> = {
-  print: 2490,
-  digital: 1290,
-};
+import { PRICES_CENTS } from "../pricing";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {

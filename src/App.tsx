@@ -7,7 +7,7 @@ import { CreateWizard } from './pages/create/CreateWizard';
 import { Revelation } from './pages/Revelation';
 import { Payment } from './pages/Payment';
 import { OrderConfirmed } from './pages/OrderConfirmed';
-import { Library } from './pages/Library';
+import { Account } from './pages/Account';
 import { BookReader } from './pages/BookReader';
 import { Login } from './pages/Login';
 
@@ -24,7 +24,8 @@ function App() {
               <Route path="/revelation" element={<Revelation />} />
               <Route path="/paiement" element={<Payment />} />
               <Route path="/commande-confirmee" element={<OrderConfirmed />} />
-              <Route path="/mes-livres" element={<Library />} />
+              <Route path="/mes-livres" element={<Navigate to="/mon-compte?tab=books" replace />} />
+              <Route path="/mon-compte" element={<Account />} />
               <Route path="/livre/:bookId" element={<BookReader />} />
               <Route path="/connexion" element={<Login />} />
             </Routes>

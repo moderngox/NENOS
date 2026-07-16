@@ -5,7 +5,7 @@ import { AuthForm } from '../components/AuthForm';
 export function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const returnTo = searchParams.get('returnTo') || '/mes-livres';
+  const returnTo = searchParams.get('returnTo') || '/mon-compte';
 
   return (
     <div className="screen">

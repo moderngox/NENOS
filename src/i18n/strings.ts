@@ -164,6 +164,22 @@ export interface Strings {
     prev: string;
     next: string;
   };
+  account: {
+    title: string;
+    ordersTab: string;
+    booksTab: string;
+    orderStatusPaid: string;
+    orderStatusPending: string;
+    orderStatusFailed: string;
+    formatPrint: string;
+    formatDigital: string;
+    noOrders: string;
+    noBooks: string;
+    readOnline: string;
+    downloadPdf: string;
+    comingSoon: string;
+    logout: string;
+  };
 }
 
 export const fr: Strings = {
@@ -409,6 +425,22 @@ export const fr: Strings = {
     prev: '← Précédent',
     next: 'Suivant →',
   },
+  account: {
+    title: 'Mon compte',
+    ordersTab: 'Commandes',
+    booksTab: 'Mes livres',
+    orderStatusPaid: 'Payée',
+    orderStatusPending: 'En attente',
+    orderStatusFailed: 'Paiement à vérifier',
+    formatPrint: 'Livre imprimé + PDF',
+    formatDigital: 'PDF + lecture web',
+    noOrders: 'Aucune commande pour le moment.',
+    noBooks: 'Aucun livre pour le moment.',
+    readOnline: 'Lire en ligne',
+    downloadPdf: 'Télécharger PDF',
+    comingSoon: 'Bientôt disponible',
+    logout: 'Se déconnecter',
+  },
 };
 
 export const en: Strings = {
@@ -652,6 +684,22 @@ export const en: Strings = {
     pageLabel: (page, total) => `Page ${page} / ${total}`,
     prev: '← Previous',
     next: 'Next →',
+  },
+  account: {
+    title: 'My account',
+    ordersTab: 'Orders',
+    booksTab: 'My books',
+    orderStatusPaid: 'Paid',
+    orderStatusPending: 'Pending',
+    orderStatusFailed: 'Payment needs review',
+    formatPrint: 'Printed book + PDF',
+    formatDigital: 'PDF + web reading',
+    noOrders: 'No orders yet.',
+    noBooks: 'No books yet.',
+    readOnline: 'Read online',
+    downloadPdf: 'Download PDF',
+    comingSoon: 'Coming soon',
+    logout: 'Log out',
   },
 };
 

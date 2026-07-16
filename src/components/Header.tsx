@@ -4,16 +4,25 @@ import { LanguageToggle } from './LanguageToggle';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 
+function AccountIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" fill="currentColor" />
+      <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}
+
 interface HeaderProps {
   variant?: 'light' | 'dark';
   showNav?: boolean;
-  activeNav?: 'library' | 'account';
+  activeNav?: 'account';
   cta?: { label: string; to: string };
 }
 
 export function Header({ variant = 'light', showNav = false, activeNav, cta }: HeaderProps) {
   const { t } = useLanguage();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const dark = variant === 'dark';
 
   return (
@@ -54,7 +63,7 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
         </span>
       </Link>
 
-      {showNav && (
+      {showNav && !activeNav && (
         <nav
           className="desktop-nav"
           style={{
@@ -64,38 +73,22 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
             color: dark ? '#c7c7d6' : '#4a4a55',
           }}
         >
-          {activeNav ? (
-            <>
-              <Link
-                to="/mes-livres"
-                style={{ color: activeNav === 'library' ? 'var(--ink)' : undefined, fontWeight: activeNav === 'library' ? 800 : 600 }}
-              >
-                {t.nav.myBooks}
-              </Link>
-              {user ? (
-                <button
-                  type="button"
-                  onClick={() => logout()}
-                  style={{ background: 'none', border: 'none', font: 'inherit', color: 'inherit', cursor: 'pointer', padding: 0 }}
-                >
-                  {t.auth.logout}
-                </button>
-              ) : (
-                <Link to="/connexion">{t.auth.login}</Link>
-              )}
-            </>
-          ) : (
-            <>
-              <span>{t.nav.how}</span>
-              <span>{t.nav.examples}</span>
-              <span>{t.nav.pricing}</span>
-            </>
-          )}
+          <span>{t.nav.how}</span>
+          <span>{t.nav.examples}</span>
+          <span>{t.nav.pricing}</span>
         </nav>
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <LanguageToggle dark={dark} />
+        <Link
+          to={user ? '/mon-compte' : '/connexion'}
+          aria-label={t.nav.account}
+          title={t.nav.account}
+          style={{ display: 'flex', color: activeNav === 'account' ? 'var(--cyan)' : dark ? 'var(--cream)' : 'var(--ink)' }}
+        >
+          <AccountIcon />
+        </Link>
         {cta && (
           <Link to={cta.to} className="cta desktop-only" style={{ fontSize: 14, padding: '10px 20px', width: 'auto' }}>
             {cta.label}
