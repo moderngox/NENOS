@@ -7,7 +7,16 @@
 		"binding": "ASSETS",
 		// Without this, a direct/refreshed request to a client-side route like
 		// /creer 404s instead of serving index.html for React Router to handle.
-		"not_found_handling": "single-page-application"
+		"not_found_handling": "single-page-application",
+		// Without this, Cloudflare's asset layer intercepts real top-level
+		// browser navigations (Sec-Fetch-Mode: navigate) to any path that
+		// isn't a literal static file — including our own /api/* routes —
+		// and serves the SPA shell directly, before worker/index.ts's fetch
+		// handler ever runs. Broke the OAuth login flow specifically, since
+		// window.location.href-based navigation to /api/auth/*/start is a
+		// real navigation, unlike the fetch()-based calls every other
+		// /api/* route is reached through.
+		"run_worker_first": true
 	},
 	"d1_databases": [
 		{
