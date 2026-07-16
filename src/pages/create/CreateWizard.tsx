@@ -17,9 +17,11 @@ const TOTAL_STEPS = 7;
 
 export function CreateWizard() {
   const { t } = useLanguage();
-  const { draft } = useBookDraft();
+  const { draft, submit } = useBookDraft();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const canAdvance = (() => {
     if (step === 1) return draft.name.trim().length > 0;
@@ -27,11 +29,24 @@ export function CreateWizard() {
     return true;
   })();
 
-  const goNext = () => {
-    if (step < TOTAL_STEPS) setStep(step + 1);
-    else navigate('/revelation');
+  const goNext = async () => {
+    if (step < TOTAL_STEPS) {
+      setStep(step + 1);
+      return;
+    }
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      await submit();
+      navigate('/revelation');
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSubmitting(false);
+    }
   };
   const goBack = () => {
+    if (submitting) return;
     if (step > 1) setStep(step - 1);
     else navigate('/');
   };
@@ -75,12 +90,12 @@ export function CreateWizard() {
           width: '100%',
         }}
       >
-        <button type="button" className="cta-secondary" style={{ flex: 1 }} onClick={goBack}>
+        <button type="button" className="cta-secondary" style={{ flex: 1 }} onClick={goBack} disabled={submitting}>
           {t.wizard.back}
         </button>
         {step === TOTAL_STEPS ? (
-          <button type="button" className="cta" style={{ flex: 2 }} onClick={goNext}>
-            {t.wizard.step7.cta}
+          <button type="button" className="cta" style={{ flex: 2 }} onClick={goNext} disabled={submitting}>
+            {submitting ? t.wizard.generating : t.wizard.step7.cta}
           </button>
         ) : (
           <button type="button" className="cta" style={{ flex: 2 }} onClick={goNext} disabled={!canAdvance}>
@@ -88,6 +103,9 @@ export function CreateWizard() {
           </button>
         )}
       </div>
+      {submitError && (
+        <p style={{ textAlign: 'center', margin: '-14px 0 20px', color: 'var(--red, #d33)' }}>{submitError}</p>
+      )}
       {step === 4 && (
         <p style={{ textAlign: 'center', margin: '-14px 0 20px' }}>
           <button

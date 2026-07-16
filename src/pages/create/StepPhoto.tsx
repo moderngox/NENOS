@@ -1,11 +1,13 @@
 import { useRef } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useBookDraft } from '../../context/BookDraftContext';
+import { useObjectUrl } from '../../hooks/useObjectUrl';
 
 export function StepPhoto() {
   const { t } = useLanguage();
   const { draft, update } = useBookDraft();
   const inputRef = useRef<HTMLInputElement>(null);
+  const photoUrl = useObjectUrl(draft.photo);
 
   const handleFiles = (files: FileList | null) => {
     if (files && files[0]) update({ photo: files[0] });
@@ -46,10 +48,11 @@ export function StepPhoto() {
           margin: '0 auto 22px',
           borderRadius: '50%',
           border: '1.5px dashed #C7C7CC',
-          background: draft.photo ? undefined : '#FFFFFF',
-          backgroundImage: draft.photo ? `url(${URL.createObjectURL(draft.photo)})` : undefined,
+          backgroundColor: photoUrl ? undefined : '#FFFFFF',
+          backgroundImage: photoUrl ? `url(${photoUrl})` : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',

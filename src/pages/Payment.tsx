@@ -2,14 +2,6 @@ import { useState } from 'react';
 import { Header } from '../components/Header';
 import { useLanguage } from '../context/LanguageContext';
 import { useBookDraft } from '../context/BookDraftContext';
-import coverFr from '../assets/cover-fr.png';
-import coverEn from '../assets/cover-en.png';
-
-const TITLES: Record<string, { fr: string; en: string }> = {
-  space: { fr: 'et le Dragon des Étoiles', en: 'and the Dragon of a Thousand Stars' },
-  pirates: { fr: ', Capitaine des Mers', en: ', Captain of the Seas' },
-  forest: { fr: 'et la Forêt Enchantée', en: 'and the Enchanted Forest' },
-};
 
 const UNIVERSE_LABELS: Record<string, { fr: string; en: string }> = {
   space: { fr: 'Espace', en: 'Space' },
@@ -19,14 +11,39 @@ const UNIVERSE_LABELS: Record<string, { fr: string; en: string }> = {
 
 export function Payment() {
   const { t, lang } = useLanguage();
-  const { draft } = useBookDraft();
+  const { draft, story, preview } = useBookDraft();
   const [format, setFormat] = useState<'print' | 'digital'>('print');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handlePay = async () => {
+    if (!story) {
+      setError(t.payment.error);
+      return;
+    }
+    setError(null);
+    setSubmitting(true);
+    try {
+      const response = await fetch(`/api/books/${story.bookId}/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ format }),
+      });
+      const body = (await response.json().catch(() => null)) as { url?: string; error?: string } | null;
+      if (!response.ok || !body?.url) {
+        throw new Error(body?.error ?? `Request failed with status ${response.status}`);
+      }
+      window.location.href = body.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setSubmitting(false);
+    }
+  };
 
   const name = draft.name || (lang === 'fr' ? 'Ton héros' : 'Your hero');
-  const suffix = TITLES[draft.universe]?.[lang] ?? TITLES.space[lang];
-  const title = `${name} ${suffix}`;
+  const title = story?.frontCover.title ?? name;
   const universeLabel = UNIVERSE_LABELS[draft.universe]?.[lang] ?? UNIVERSE_LABELS.space[lang];
-  const cover = lang === 'fr' ? coverFr : coverEn;
+  const cover = preview.assets?.coverFrontUrl ?? null;
 
   const prices = { print: lang === 'fr' ? '24,90€' : '$24.90', digital: lang === 'fr' ? '12,90€' : '$12.90' };
   const total = prices[format];
@@ -51,7 +68,19 @@ export function Payment() {
               marginBottom: 28,
             }}
           >
-            <div style={{ width: 72, height: 92, flex: 'none', border: '1px solid var(--border)', borderRadius: 6, backgroundImage: `url(${cover})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+            <div
+              style={{
+                width: 72,
+                height: 92,
+                flex: 'none',
+                border: '1px solid var(--border)',
+                borderRadius: 6,
+                background: cover ? undefined : 'var(--gray-bg)',
+                backgroundImage: cover ? `url(${cover})` : undefined,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
             <div>
               <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 17, color: 'var(--ink)' }}>{title}</div>
               <div style={{ font: '600 12px Geist', color: 'var(--muted)', marginTop: 6 }}>
@@ -117,9 +146,12 @@ export function Payment() {
             <span style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 17, color: 'var(--ink)' }}>{t.payment.total}</span>
             <span style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 24, color: 'var(--ink)' }}>{total}</span>
           </div>
-          <button type="button" className="cta" style={{ marginBottom: 10 }}>
-            {t.payment.cta}
+          <button type="button" className="cta" style={{ marginBottom: 10 }} onClick={handlePay} disabled={submitting}>
+            {submitting ? t.payment.redirecting : t.payment.cta}
           </button>
+          {error && (
+            <p style={{ textAlign: 'center', font: '600 12px Geist', color: 'var(--red, #d33)', margin: '0 0 10px' }}>{error}</p>
+          )}
           <p style={{ textAlign: 'center', font: '600 12px Geist', color: 'var(--muted)', margin: 0 }}>{t.payment.security}</p>
         </div>
       </div>

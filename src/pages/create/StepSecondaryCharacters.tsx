@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useBookDraft, MAX_SECONDARY_CHARACTERS, type SecondaryCharacter } from '../../context/BookDraftContext';
+import { useObjectUrl } from '../../hooks/useObjectUrl';
 
 type Mode = 'list' | 'role' | 'details';
 
@@ -9,6 +10,7 @@ interface CharacterDraft {
   name: string;
   age: number | null;
   photo: File | null;
+  skinColor: string | null;
   hairColor: string | null;
   eyeColor: string | null;
   description: string;
@@ -19,6 +21,7 @@ const emptyCharacterDraft: CharacterDraft = {
   name: '',
   age: null,
   photo: null,
+  skinColor: null,
   hairColor: null,
   eyeColor: null,
   description: '',
@@ -71,6 +74,7 @@ export function StepSecondaryCharacters({ heroName }: { heroName: string }) {
   const [mode, setMode] = useState<Mode>('list');
   const [charDraft, setCharDraft] = useState<CharacterDraft>(emptyCharacterDraft);
   const fileRef = useRef<HTMLInputElement>(null);
+  const charPhotoUrl = useObjectUrl(charDraft.photo);
 
   const characters = draft.secondaryCharacters;
   const canAddMore = characters.length < MAX_SECONDARY_CHARACTERS;
@@ -99,6 +103,7 @@ export function StepSecondaryCharacters({ heroName }: { heroName: string }) {
       name: charDraft.name.trim(),
       age: charDraft.age,
       photo: charDraft.photo,
+      skinColor: charDraft.skinColor,
       hairColor: charDraft.hairColor,
       eyeColor: charDraft.eyeColor,
       description: charDraft.description,
@@ -359,15 +364,16 @@ export function StepSecondaryCharacters({ heroName }: { heroName: string }) {
                   color: 'var(--ink-soft)',
                 }}
               >
-                {charDraft.photo ? (
+                {charPhotoUrl ? (
                   <span
                     style={{
                       width: 28,
                       height: 28,
                       borderRadius: '50%',
-                      backgroundImage: `url(${URL.createObjectURL(charDraft.photo)})`,
+                      backgroundImage: `url(${charPhotoUrl})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
                       flex: 'none',
                     }}
                   />
@@ -384,6 +390,17 @@ export function StepSecondaryCharacters({ heroName }: { heroName: string }) {
                 accept="image/png,image/jpeg"
                 hidden
                 onChange={(e) => e.target.files?.[0] && setCharDraft((p) => ({ ...p, photo: e.target.files![0] }))}
+              />
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', font: '700 11.5px Geist', color: 'var(--ink)', marginBottom: 8 }}>
+                {t.wizard.step7.skinLabel}
+              </label>
+              <SwatchRow
+                options={t.wizard.step7.skinColors}
+                selected={charDraft.skinColor}
+                onSelect={(id) => setCharDraft((p) => ({ ...p, skinColor: id }))}
               />
             </div>
 

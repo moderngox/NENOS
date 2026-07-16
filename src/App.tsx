@@ -5,6 +5,7 @@ import { Landing } from './pages/Landing';
 import { CreateWizard } from './pages/create/CreateWizard';
 import { Revelation } from './pages/Revelation';
 import { Payment } from './pages/Payment';
+import { OrderConfirmed } from './pages/OrderConfirmed';
 import { Library } from './pages/Library';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
             <Route path="/creer" element={<CreateWizard />} />
             <Route path="/revelation" element={<Revelation />} />
             <Route path="/paiement" element={<Payment />} />
+            <Route path="/commande-confirmee" element={<OrderConfirmed />} />
             <Route path="/mes-livres" element={<Library />} />
           </Routes>
         </BrowserRouter>

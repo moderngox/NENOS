@@ -1,44 +1,50 @@
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Header } from '../components/Header';
 import { useLanguage } from '../context/LanguageContext';
 import { useBookDraft } from '../context/BookDraftContext';
-import heroChild from '../assets/hero-child.png';
-import avatarAlt from '../assets/avatar-alt.png';
-import coverFr from '../assets/cover-fr.png';
-import coverEn from '../assets/cover-en.png';
-import page1Fr from '../assets/page-1-fr.png';
-import page2Fr from '../assets/page-2-fr.png';
-import page1En from '../assets/page-1-en.png';
-import page2En from '../assets/page-2-en.png';
 
-const TITLE_TEMPLATES: Record<string, { fr: (name: string) => string; en: (name: string) => string }> = {
-  space: {
-    fr: (name) => `${name} et le Dragon des Étoiles`,
-    en: (name) => `${name} and the Dragon of a Thousand Stars`,
-  },
-  pirates: {
-    fr: (name) => `${name}, Capitaine des Mers`,
-    en: (name) => `${name}, Captain of the Seas`,
-  },
-  forest: {
-    fr: (name) => `${name} et la Forêt Enchantée`,
-    en: (name) => `${name} and the Enchanted Forest`,
-  },
-};
+function Spinner() {
+  return (
+    <span
+      className="spinner"
+      style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid var(--border)', borderTopColor: 'var(--ink)', display: 'inline-block' }}
+    />
+  );
+}
 
 export function Revelation() {
   const { t, lang } = useLanguage();
-  const { draft } = useBookDraft();
+  const { story, preview, generatePreview } = useBookDraft();
 
-  const name = draft.name || (lang === 'fr' ? 'ton héros' : 'your hero');
-  const template = TITLE_TEMPLATES[draft.universe] ?? TITLE_TEMPLATES.space;
-  const title = lang === 'fr' ? template.fr(name) : template.en(name);
+  useEffect(() => {
+    if (story && preview.status === 'idle') {
+      generatePreview().catch(() => {
+        // failure is already captured in preview.status/preview.error
+      });
+    }
+  }, [story, preview.status, generatePreview]);
+
+  if (!story) {
+    return (
+      <div className="screen">
+        <Header variant="light" />
+        <div className="container" style={{ padding: '60px 22px', textAlign: 'center' }}>
+          <p style={{ fontFamily: 'Geist, sans-serif', fontWeight: 700, marginBottom: 20 }}>
+            {lang === 'fr' ? 'Créons d’abord ton histoire !' : "Let's create your story first!"}
+          </p>
+          <Link to="/creer" className="cta">
+            {lang === 'fr' ? 'Créer mon livre →' : 'Create my book →'}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const price = lang === 'fr' ? '24,90€' : '$24.90';
-
-  const avatarImg = lang === 'fr' ? heroChild : avatarAlt;
-  const coverImg = lang === 'fr' ? coverFr : coverEn;
-  const page1 = lang === 'fr' ? page1Fr : page1En;
-  const page2 = lang === 'fr' ? page2Fr : page2En;
+  const { title, subtitle } = story.frontCover;
+  const page1Text = story.pages[0]?.text ?? '';
+  const isGenerating = preview.status === 'generating' || preview.status === 'idle';
 
   return (
     <div className="screen">
@@ -50,22 +56,7 @@ export function Revelation() {
             <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 24 }}>
               {t.revelation.heroReady}
             </div>
-            <div style={{ position: 'relative', width: 150, height: 150, margin: '0 auto 24px' }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  borderRadius: '50%',
-                  border: '4px solid #FFFFFF',
-                  boxShadow: '0 6px 20px rgba(0,0,0,.18)',
-                  backgroundImage: `url(${avatarImg})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              />
-              <div style={{ position: 'absolute', top: -10, left: -14, width: 10, height: 10, borderRadius: '50%', background: 'var(--cyan)' }} />
-              <div style={{ position: 'absolute', bottom: -6, right: -16, width: 12, height: 12, transform: 'rotate(45deg)', background: 'var(--ink)', borderRadius: 2 }} />
-            </div>
+
             <div
               style={{
                 width: 200,
@@ -77,10 +68,79 @@ export function Revelation() {
                 background: '#fff',
               }}
             >
-              <div style={{ height: 220, backgroundImage: `url(${coverImg})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-            </div>
-            <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 17, color: 'var(--ink)', marginTop: 16 }}>
-              {title}
+              <div style={{ position: 'relative', height: 260 }}>
+                {preview.status === 'ready' && preview.assets ? (
+                  <>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        backgroundImage: `url(${preview.assets.coverFrontUrl})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to bottom, rgba(0,0,0,.5), rgba(0,0,0,0) 55%)',
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 14,
+                        left: 12,
+                        right: 12,
+                        color: '#fff',
+                        fontFamily: '"Baloo 2", Geist, sans-serif',
+                        fontWeight: 800,
+                        fontSize: 16,
+                        lineHeight: 1.15,
+                        textShadow: '0 2px 6px rgba(0,0,0,.55)',
+                      }}
+                    >
+                      {title}
+                    </div>
+                    {subtitle && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: 62,
+                          left: 12,
+                          right: 12,
+                          color: '#fff',
+                          font: '600 11px Geist',
+                          textShadow: '0 1px 4px rgba(0,0,0,.5)',
+                        }}
+                      >
+                        {subtitle}
+                      </div>
+                    )}
+                  </>
+                ) : preview.status === 'error' ? (
+                  <div
+                    style={{
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 14,
+                      textAlign: 'center',
+                      font: '600 11px Geist',
+                      color: 'var(--muted)',
+                    }}
+                  >
+                    {preview.error}
+                  </div>
+                ) : (
+                  <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                    <Spinner />
+                    <span style={{ font: '600 11px Geist', color: 'var(--muted)' }}>{t.wizard.generating}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -89,8 +149,41 @@ export function Revelation() {
               {t.revelation.previewTitle}
             </div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 24, position: 'relative', flexWrap: 'wrap' }}>
-              <div style={{ width: 180, height: 132, backgroundImage: `url(${page1})`, backgroundSize: 'cover', backgroundPosition: 'center', border: '1px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 14px rgba(0,0,0,.10)' }} />
-              <div style={{ width: 180, height: 132, backgroundImage: `url(${page2})`, backgroundSize: 'cover', backgroundPosition: 'center', border: '1px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 14px rgba(0,0,0,.10)' }} />
+              <div
+                style={{
+                  width: 180,
+                  height: 132,
+                  backgroundImage: preview.assets ? `url(${preview.assets.page1Url})` : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  border: '1px solid var(--border)',
+                  borderRadius: 10,
+                  boxShadow: '0 4px 14px rgba(0,0,0,.10)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {isGenerating && <Spinner />}
+                {preview.status === 'error' && <span style={{ font: '600 10px Geist', color: 'var(--muted)' }}>—</span>}
+              </div>
+              <div
+                style={{
+                  width: 180,
+                  height: 132,
+                  border: '1px solid var(--border)',
+                  borderRadius: 10,
+                  boxShadow: '0 4px 14px rgba(0,0,0,.10)',
+                  background: '#fff',
+                  padding: 12,
+                  overflow: 'hidden',
+                  font: '500 11px Geist',
+                  color: 'var(--ink)',
+                  lineHeight: 1.4,
+                }}
+              >
+                {page1Text}
+              </div>
               <div
                 style={{
                   position: 'absolute',

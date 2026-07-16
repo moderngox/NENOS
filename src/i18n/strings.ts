@@ -17,6 +17,8 @@ export interface Strings {
     back: string;
     next: string;
     skip: string;
+    generating: string;
+    submitError: string;
     step1: { title: string; placeholder: string; helper: string };
     step2: { title: string; helper: string };
     step3: {
@@ -46,6 +48,8 @@ export interface Strings {
     step6: {
       title: string;
       helper: string;
+      skinTitle: string;
+      skinColors: { id: string; label: string; swatch: string }[];
       hairTitle: string;
       hairColors: { id: string; label: string; swatch: string }[];
       eyeTitle: string;
@@ -71,8 +75,10 @@ export interface Strings {
       photoLabel: string;
       photoOptional: string;
       addPhoto: string;
+      skinLabel: string;
       hairLabel: string;
       eyeLabel: string;
+      skinColors: { id: string; label: string; swatch: string }[];
       hairColors: { id: string; label: string; swatch: string }[];
       eyeColors: { id: string; label: string; swatch: string }[];
       descriptionLabel: string;
@@ -103,6 +109,13 @@ export interface Strings {
     total: string;
     cta: string;
     security: string;
+    redirecting: string;
+    error: string;
+  };
+  orderConfirmed: {
+    title: string;
+    message: string;
+    backHome: string;
   };
   library: {
     title: string;
@@ -141,6 +154,8 @@ export const fr: Strings = {
     back: '← Retour',
     next: 'Suivant →',
     skip: 'Passer cette étape →',
+    generating: 'Création de ton histoire...',
+    submitError: 'Une erreur est survenue. Réessaie.',
     step1: {
       title: 'Comment s’appelle ton héros ?',
       placeholder: 'Prénom',
@@ -183,6 +198,16 @@ export const fr: Strings = {
       title: 'À quoi ressemble-t-il / elle ?',
       helper:
         'Facultatif — sans photo, ces détails nous aident à générer un avatar qui lui ressemble vraiment.',
+      skinTitle: 'Couleur de peau',
+      skinColors: [
+        { id: 'tres_claire', label: 'Très claire', swatch: '#FFE0BD' },
+        { id: 'claire', label: 'Claire', swatch: '#F1C27D' },
+        { id: 'doree', label: 'Dorée', swatch: '#E0AC69' },
+        { id: 'mate', label: 'Mate', swatch: '#C68642' },
+        { id: 'brune', label: 'Brune', swatch: '#8D5524' },
+        { id: 'foncee', label: 'Foncée', swatch: '#5C3317' },
+        { id: 'autre', label: 'Autre', swatch: '' },
+      ],
       hairTitle: 'Couleur des cheveux',
       hairColors: [
         { id: 'blond', label: 'Blond', swatch: '#D9B96C' },
@@ -236,8 +261,17 @@ export const fr: Strings = {
       photoLabel: 'Photo',
       photoOptional: 'Facultatif',
       addPhoto: 'Ajouter une photo',
+      skinLabel: 'Couleur de peau (facultatif)',
       hairLabel: 'Couleur des cheveux (facultatif)',
       eyeLabel: 'Couleur des yeux (facultatif)',
+      skinColors: [
+        { id: 'tres_claire', label: 'Très claire', swatch: '#FFE0BD' },
+        { id: 'claire', label: 'Claire', swatch: '#F1C27D' },
+        { id: 'doree', label: 'Dorée', swatch: '#E0AC69' },
+        { id: 'mate', label: 'Mate', swatch: '#C68642' },
+        { id: 'brune', label: 'Brune', swatch: '#8D5524' },
+        { id: 'foncee', label: 'Foncée', swatch: '#5C3317' },
+      ],
       hairColors: [
         { id: 'blond_clair', label: 'Blond clair', swatch: '#E6D2A0' },
         { id: 'blond', label: 'Blond', swatch: '#D9B96C' },
@@ -281,6 +315,13 @@ export const fr: Strings = {
     total: 'Total',
     cta: 'Payer et recevoir mon livre',
     security: '🔒 Paiement sécurisé · satisfait ou remboursé',
+    redirecting: 'Redirection vers le paiement sécurisé...',
+    error: 'Le paiement n’a pas pu démarrer. Réessaie.',
+  },
+  orderConfirmed: {
+    title: 'Merci pour ta commande ! 🎉',
+    message: 'Ton livre est en cours de préparation. Tu recevras un e-mail dès qu’il sera prêt.',
+    backHome: '← Retour à l’accueil',
   },
   library: {
     title: 'Mes livres',
@@ -319,6 +360,8 @@ export const en: Strings = {
     back: '← Back',
     next: 'Next →',
     skip: 'Skip this step →',
+    generating: 'Creating your story...',
+    submitError: 'Something went wrong. Please try again.',
     step1: {
       title: 'What’s your hero’s name?',
       placeholder: 'First name',
@@ -360,6 +403,16 @@ export const en: Strings = {
     step6: {
       title: 'What do they look like?',
       helper: 'Optional — without a photo, these details help us generate an avatar that really looks like them.',
+      skinTitle: 'Skin tone',
+      skinColors: [
+        { id: 'tres_claire', label: 'Very fair', swatch: '#FFE0BD' },
+        { id: 'claire', label: 'Fair', swatch: '#F1C27D' },
+        { id: 'doree', label: 'Golden', swatch: '#E0AC69' },
+        { id: 'mate', label: 'Tan', swatch: '#C68642' },
+        { id: 'brune', label: 'Brown', swatch: '#8D5524' },
+        { id: 'foncee', label: 'Dark', swatch: '#5C3317' },
+        { id: 'autre', label: 'Other', swatch: '' },
+      ],
       hairTitle: 'Hair color',
       hairColors: [
         { id: 'blond', label: 'Blond', swatch: '#D9B96C' },
@@ -413,8 +466,17 @@ export const en: Strings = {
       photoLabel: 'Photo',
       photoOptional: 'Optional',
       addPhoto: 'Add a photo',
+      skinLabel: 'Skin tone (optional)',
       hairLabel: 'Hair color (optional)',
       eyeLabel: 'Eye color (optional)',
+      skinColors: [
+        { id: 'tres_claire', label: 'Very fair', swatch: '#FFE0BD' },
+        { id: 'claire', label: 'Fair', swatch: '#F1C27D' },
+        { id: 'doree', label: 'Golden', swatch: '#E0AC69' },
+        { id: 'mate', label: 'Tan', swatch: '#C68642' },
+        { id: 'brune', label: 'Brown', swatch: '#8D5524' },
+        { id: 'foncee', label: 'Dark', swatch: '#5C3317' },
+      ],
       hairColors: [
         { id: 'blond_clair', label: 'Light blond', swatch: '#E6D2A0' },
         { id: 'blond', label: 'Blond', swatch: '#D9B96C' },
@@ -458,6 +520,13 @@ export const en: Strings = {
     total: 'Total',
     cta: 'Pay and receive my book',
     security: '🔒 Secure payment · money-back guarantee',
+    redirecting: 'Redirecting to secure payment...',
+    error: 'Payment could not start. Please try again.',
+  },
+  orderConfirmed: {
+    title: 'Thank you for your order! 🎉',
+    message: "Your book is being prepared. You'll get an email as soon as it's ready.",
+    backHome: '← Back to home',
   },
   library: {
     title: 'My books',

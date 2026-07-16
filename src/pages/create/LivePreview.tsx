@@ -1,11 +1,14 @@
 import { useLanguage } from '../../context/LanguageContext';
 import { useBookDraft } from '../../context/BookDraftContext';
+import { useObjectUrl } from '../../hooks/useObjectUrl';
 
 export function LivePreview() {
   const { t } = useLanguage();
   const { draft } = useBookDraft();
+  const photoUrl = useObjectUrl(draft.photo);
 
   const universeLabel = t.wizard.step3.universes.find((u) => u.id === draft.universe)?.label ?? '';
+  const skin = t.wizard.step6.skinColors.find((s) => s.id === draft.skinColor);
   const hair = t.wizard.step6.hairColors.find((h) => h.id === draft.hairColor);
   const eye = t.wizard.step6.eyeColors.find((e) => e.id === draft.eyeColor);
 
@@ -34,8 +37,8 @@ export function LivePreview() {
           height: 96,
           borderRadius: '50%',
           margin: '0 auto 14px',
-          background: draft.photo
-            ? `url(${URL.createObjectURL(draft.photo)}) center / cover no-repeat`
+          background: photoUrl
+            ? `url(${photoUrl}) center / cover no-repeat`
             : hair && hair.swatch
               ? hair.swatch
               : '#F0F0F2',
@@ -43,7 +46,7 @@ export function LivePreview() {
           boxShadow: '0 6px 20px rgba(0,0,0,.1)',
         }}
       >
-        {!draft.photo && eye && eye.swatch && (
+        {!photoUrl && eye && eye.swatch && (
           <div
             style={{
               position: 'absolute',
@@ -66,10 +69,10 @@ export function LivePreview() {
         {draft.traits.length > 0 ? draft.traits.join(', ') : '—'}
         <br />
         {universeLabel && `${t.wizard.step3.universeTitle.split(' ')[0]} : ${universeLabel}`}
-        {(hair || eye) && (
+        {(skin || hair || eye) && (
           <>
             <br />
-            {[hair?.label, eye?.label].filter(Boolean).join(' · ')}
+            {[skin?.label, hair?.label, eye?.label].filter(Boolean).join(' · ')}
           </>
         )}
         {draft.secondaryCharacters.length > 0 && (

@@ -77,6 +77,12 @@ export function StepAppearance() {
       <p style={{ font: '600 13px/1.5 Geist', color: 'var(--ink-soft)', margin: '0 0 22px' }}>{t.wizard.step6.helper}</p>
 
       <ColorSwatchRow
+        title={t.wizard.step6.skinTitle}
+        options={t.wizard.step6.skinColors}
+        selected={draft.skinColor}
+        onSelect={(id) => update({ skinColor: id })}
+      />
+      <ColorSwatchRow
         title={t.wizard.step6.hairTitle}
         options={t.wizard.step6.hairColors}
         selected={draft.hairColor}
