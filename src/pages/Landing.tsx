@@ -69,13 +69,17 @@ export function Landing() {
           padding: '36px 22px',
         }}
       >
-        <div
+        <Link
+          to="/exemples/lea-dragon-etoiles"
           className="container"
           style={{
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
             gap: 24,
+            textDecoration: 'none',
+            color: 'inherit',
+            cursor: 'pointer',
           }}
         >
           <div
@@ -140,7 +144,7 @@ export function Landing() {
               </span>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );
