@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '../components/Header';
+import { BackButton } from '../components/BackButton';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -84,6 +85,7 @@ export function Account() {
     <div className="screen">
       <Header variant="light" showNav activeNav="account" />
       <div className="container" style={{ padding: '32px 22px 40px' }}>
+        <BackButton fallback="/" />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
           <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 26, color: 'var(--ink)' }}>{t.account.title}</div>
           <button

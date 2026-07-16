@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Header } from '../components/Header';
+import { BackButton } from '../components/BackButton';
 import { useLanguage } from '../context/LanguageContext';
 import { exampleBooks } from '../data/exampleBooks';
 
@@ -30,7 +31,7 @@ export function ExampleReader() {
       <div className="screen">
         <Header variant="light" showNav />
         <div className="container" style={{ padding: '60px 22px', textAlign: 'center' }}>
-          <Link to="/exemples">{t.examplesPage.backToList}</Link>
+          <BackButton fallback="/exemples" />
         </div>
       </div>
     );
@@ -40,9 +41,7 @@ export function ExampleReader() {
     <div className="screen">
       <Header variant="light" showNav />
       <div className="container" style={{ padding: '32px 22px 40px', maxWidth: 720, margin: '0 auto' }}>
-        <Link to="/exemples" style={{ font: '700 13px Geist', color: 'var(--muted)', display: 'inline-block', marginBottom: 16 }}>
-          {t.examplesPage.backToList}
-        </Link>
+        <BackButton fallback="/exemples" />
 
         <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 4 }}>
           {t.examplesPage.bookTitle}

@@ -1,7 +1,7 @@
 export type Lang = 'fr' | 'en';
 
 export interface Strings {
-  nav: { how: string; examples: string; pricing: string; myBooks: string; account: string };
+  nav: { how: string; examples: string; pricing: string; myBooks: string; account: string; back: string };
   examplesPage: {
     title: string;
     intro: string;
@@ -12,7 +12,6 @@ export interface Strings {
     bookStyle: string;
     bookUniverse: string;
     readCta: string;
-    backToList: string;
   };
   landing: {
     headline: string;
@@ -215,7 +214,7 @@ export interface Strings {
 }
 
 export const fr: Strings = {
-  nav: { how: 'Comment ça marche', examples: 'Exemples', pricing: 'Tarifs', myBooks: 'Mes livres', account: 'Compte' },
+  nav: { how: 'Comment ça marche', examples: 'Exemples', pricing: 'Tarifs', myBooks: 'Mes livres', account: 'Compte', back: '← Retour' },
   examplesPage: {
     title: 'Exemples de livres',
     intro: 'Un aperçu du style Kiddoverse, avec Léa dans sa propre aventure sous les étoiles.',
@@ -226,7 +225,6 @@ export const fr: Strings = {
     bookStyle: 'Comic à effet demi-ton',
     bookUniverse: 'Ciel étoilé nocturne',
     readCta: 'Lire →',
-    backToList: '← Tous les exemples',
   },
   landing: {
     headline: 'Le livre où TON enfant est le héros ★',
@@ -507,7 +505,7 @@ export const fr: Strings = {
 };
 
 export const en: Strings = {
-  nav: { how: 'How it works', examples: 'Examples', pricing: 'Pricing', myBooks: 'My books', account: 'Account' },
+  nav: { how: 'How it works', examples: 'Examples', pricing: 'Pricing', myBooks: 'My books', account: 'Account', back: '← Back' },
   examplesPage: {
     title: 'Book examples',
     intro: 'A look at the Kiddoverse style, starring Lea in her own night-sky adventure.',
@@ -518,7 +516,6 @@ export const en: Strings = {
     bookStyle: 'Halftone comic',
     bookUniverse: 'Starry night sky',
     readCta: 'Read →',
-    backToList: '← All examples',
   },
   landing: {
     headline: 'The book where YOUR child is the hero ★',

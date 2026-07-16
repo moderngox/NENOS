@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
+import { BackButton } from '../components/BackButton';
 import { useLanguage } from '../context/LanguageContext';
 import { exampleBooks } from '../data/exampleBooks';
 
@@ -10,6 +11,7 @@ export function Examples() {
     <div className="screen">
       <Header variant="light" showNav />
       <div className="container" style={{ padding: '32px 22px 40px', maxWidth: 720, margin: '0 auto' }}>
+        <BackButton fallback="/" />
         <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 26, color: 'var(--ink)', marginBottom: 8 }}>
           {t.examplesPage.title}
         </div>
