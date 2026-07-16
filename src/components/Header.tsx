@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logoMark from '../assets/logo-mark.png';
 import { LanguageToggle } from './LanguageToggle';
@@ -13,6 +14,22 @@ function AccountIcon() {
   );
 }
 
+function HamburgerIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 interface HeaderProps {
   variant?: 'light' | 'dark';
   showNav?: boolean;
@@ -24,6 +41,8 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
   const { t } = useLanguage();
   const { user } = useAuth();
   const dark = variant === 'dark';
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const showMarketingNav = showNav && !activeNav;
 
   return (
     <header
@@ -63,7 +82,7 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
         </span>
       </Link>
 
-      {showNav && !activeNav && (
+      {showMarketingNav && (
         <nav
           className="desktop-nav"
           style={{
@@ -83,6 +102,17 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <LanguageToggle dark={dark} />
+        {showMarketingNav && (
+          <button
+            type="button"
+            className="mobile-only"
+            aria-label="Menu"
+            onClick={() => setDrawerOpen(true)}
+            style={{ display: 'flex', background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: dark ? 'var(--cream)' : 'var(--ink)' }}
+          >
+            <HamburgerIcon />
+          </button>
+        )}
         <Link
           to={user ? '/mon-compte' : '/connexion'}
           aria-label={t.nav.account}
@@ -97,6 +127,52 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
           </Link>
         )}
       </div>
+
+      {showMarketingNav && drawerOpen && (
+        <div className="mobile-only" style={{ position: 'fixed', inset: 0, zIndex: 100 }}>
+          <div
+            onClick={() => setDrawerOpen(false)}
+            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              width: '78%',
+              maxWidth: 300,
+              background: '#fff',
+              boxShadow: '-8px 0 24px rgba(0,0,0,.18)',
+              padding: '14px 22px 22px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(false)}
+                aria-label="Fermer"
+                style={{ background: 'none', border: 'none', padding: 6, color: 'var(--ink)', cursor: 'pointer' }}
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <span style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0', borderBottom: '1px solid var(--border)' }}>
+              {t.nav.how}
+            </span>
+            <Link
+              to="/exemples"
+              onClick={() => setDrawerOpen(false)}
+              style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0', borderBottom: '1px solid var(--border)', textDecoration: 'none' }}
+            >
+              {t.nav.examples}
+            </Link>
+            <span style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0' }}>{t.nav.pricing}</span>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
