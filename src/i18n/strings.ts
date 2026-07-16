@@ -133,8 +133,11 @@ export interface Strings {
   };
   orderConfirmed: {
     title: string;
-    message: string;
-    viewBook: string;
+    subtitle: string;
+    stepPaid: string;
+    stepPreparing: string;
+    stepEmail: string;
+    trackProgress: string;
     backHome: string;
   };
   library: {
@@ -392,10 +395,12 @@ export const fr: Strings = {
     error: 'Le paiement n’a pas pu démarrer. Réessaie.',
   },
   orderConfirmed: {
-    title: 'Merci pour ta commande ! 🎉',
-    message:
-      'Ton livre est en cours de préparation, ça peut prendre jusqu\'à 30 minutes. Tu seras prévenu(e) par e-mail dès qu\'il sera prêt — c\'est à ce moment-là que ta carte sera débitée.',
-    viewBook: 'Voir mon livre →',
+    title: 'Commande confirmée !',
+    subtitle: 'Ton paiement a bien été reçu. Voici la suite :',
+    stepPaid: 'Paiement confirmé',
+    stepPreparing: 'Préparation de ton livre (jusqu\'à 30 min)',
+    stepEmail: 'Un e-mail dès qu\'il est prêt — c\'est à ce moment que ta carte sera débitée',
+    trackProgress: 'Suivre la préparation →',
     backHome: '← Retour à l’accueil',
   },
   library: {
@@ -652,10 +657,12 @@ export const en: Strings = {
     error: 'Payment could not start. Please try again.',
   },
   orderConfirmed: {
-    title: 'Thank you for your order! 🎉',
-    message:
-      "Your book is being prepared, which can take up to 30 minutes. You'll get an email as soon as it's ready — that's when your card will be charged.",
-    viewBook: 'View my book →',
+    title: 'Order confirmed!',
+    subtitle: "Your payment went through. Here's what happens next:",
+    stepPaid: 'Payment confirmed',
+    stepPreparing: 'Preparing your book (up to 30 min)',
+    stepEmail: "An email once it's ready — that's when your card will be charged",
+    trackProgress: 'Track progress →',
     backHome: '← Back to home',
   },
   library: {
