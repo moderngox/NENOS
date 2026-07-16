@@ -70,6 +70,12 @@ export async function handleGeneratePreview(bookId: string, env: Env): Promise<R
   if (book.previewStatus === "ready" && book.previewAssets) {
     return jsonResponse({ previewStatus: "ready", assets: assetUrls(bookId, book.previewAssets) });
   }
+  // A previous call already kicked off generation (possibly interrupted
+  // client-side by a reload, but still running server-side) — report back
+  // instead of starting a second, duplicate, paid generation run.
+  if (book.previewStatus === "generating") {
+    return jsonResponse({ previewStatus: "generating" }, 202);
+  }
 
   await updateBookPreview(env.DB, bookId, "generating", null);
 
