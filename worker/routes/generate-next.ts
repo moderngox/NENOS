@@ -18,6 +18,14 @@ const PAGE_SIZE = "1024x1536";
 // otherwise-successful generations. Generous margin, well under Workers'
 // request limits.
 const FULL_TIMEOUT_MS = 280000;
+// A "generating" lock older than this is treated as abandoned (the request
+// that set it crashed, timed out at the platform level, or otherwise never
+// reached the completion/error handler that would have released it) rather
+// than genuinely in flight — otherwise a single crashed request strands the
+// book at this status forever, since the cron's own idempotency check would
+// keep confirming "still generating" without ever retrying. Comfortably
+// longer than FULL_TIMEOUT_MS plus overhead.
+const STALE_LOCK_MS = 10 * 60 * 1000;
 
 type Unit =
   | { kind: "character-sheet"; filename: string }
@@ -59,8 +67,9 @@ export async function generateNextUnit(bookId: string, env: Env): Promise<Genera
   // Same idempotency pattern as the sneak peek: a second in-flight call
   // (e.g. two open reader tabs, or a cron tick overlapping client polling)
   // reports back instead of racing a duplicate, costly high-quality
-  // generation for the same unit.
-  if (book.fullStatus === "generating") {
+  // generation for the same unit — unless the lock is stale (see
+  // STALE_LOCK_MS), in which case we treat it as abandoned and retry.
+  if (book.fullStatus === "generating" && Date.now() - new Date(book.updatedAt).getTime() < STALE_LOCK_MS) {
     return { ok: true, fullStatus: "generating", done: book.fullUnitsDone, total };
   }
 

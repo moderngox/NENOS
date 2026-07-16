@@ -80,6 +80,7 @@ interface BookRow {
   stripe_payment_intent_id: string | null;
   format: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 function mapRowToStoredBook(row: BookRow): StoredBook {
@@ -117,6 +118,7 @@ function mapRowToStoredBook(row: BookRow): StoredBook {
     stripePaymentIntentId: row.stripe_payment_intent_id,
     format: row.format,
     createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 

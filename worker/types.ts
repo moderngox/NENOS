@@ -73,4 +73,5 @@ export interface StoredBook {
   stripePaymentIntentId: string | null;
   format: string | null;
   createdAt: string;
+  updatedAt: string;
 }
