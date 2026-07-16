@@ -92,7 +92,9 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
             color: dark ? '#c7c7d6' : '#4a4a55',
           }}
         >
-          <span>{t.nav.how}</span>
+          <Link to="/comment-ca-marche" style={{ color: 'inherit' }}>
+            {t.nav.how}
+          </Link>
           <Link to="/exemples" style={{ color: 'inherit' }}>
             {t.nav.examples}
           </Link>
@@ -159,9 +161,13 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
                 <CloseIcon />
               </button>
             </div>
-            <span style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0', borderBottom: '1px solid var(--border)' }}>
+            <Link
+              to="/comment-ca-marche"
+              onClick={() => setDrawerOpen(false)}
+              style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0', borderBottom: '1px solid var(--border)', textDecoration: 'none' }}
+            >
               {t.nav.how}
-            </span>
+            </Link>
             <Link
               to="/exemples"
               onClick={() => setDrawerOpen(false)}

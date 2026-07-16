@@ -22,6 +22,14 @@ export interface Strings {
     badgeIllustrated: string;
     badgeRealName: string;
   };
+  howItWorks: {
+    title: string;
+    intro: string;
+    steps: { title: string; description: string }[];
+    disclaimerTitle: string;
+    disclaimer: string;
+    cta: string;
+  };
   wizard: {
     stepLabel: (step: number, total: number, title: string) => string;
     stepShortTitles: string[];
@@ -237,6 +245,41 @@ export const fr: Strings = {
     exampleQuote: '"Léa, 6 ans, terrassée de joie de se voir en héroïne !"',
     badgeIllustrated: 'Illustré',
     badgeRealName: 'Prénom réel',
+  },
+  howItWorks: {
+    title: 'Comment ça marche',
+    intro: 'De la première idée au livre entre ses mains, en 5 étapes simples.',
+    steps: [
+      {
+        title: 'Présente-nous ton héros',
+        description:
+          'Prénom, âge, traits de caractère, univers et style graphique : tout sert à construire un personnage qui lui ressemble.',
+      },
+      {
+        title: 'Ajoute une touche personnelle',
+        description:
+          'Une idée d’histoire, une photo, des détails d’apparence ou des personnages secondaires (famille, amis, doudou...) — tout est facultatif.',
+      },
+      {
+        title: 'Découvre un aperçu gratuit',
+        description:
+          'En quelques instants, on génère une fiche personnage, la couverture et la première page — sans engagement.',
+      },
+      {
+        title: 'Choisis ton format et commande',
+        description:
+          'Livre numérique ou imprimé, connexion à ton compte, puis paiement : ta carte est simplement autorisée, pas encore débitée.',
+      },
+      {
+        title: 'Reçois ton livre',
+        description:
+          'La génération complète prend jusqu’à 30 minutes. Tu reçois un e-mail dès qu’il est prêt — c’est à ce moment-là seulement que ta carte est débitée.',
+      },
+    ],
+    disclaimerTitle: 'Et le paiement dans tout ça ?',
+    disclaimer:
+      'Au moment de la commande, on autorise simplement ta carte — comme une pré-réservation. Elle n’est débitée qu’une fois le livre entièrement généré et prêt à être lu, au moment où l’e-mail de confirmation arrive.',
+    cta: 'Créer le livre →',
   },
   wizard: {
     stepLabel: (step, total, title) => `ÉTAPE ${step} / ${total} — ${title}`,
@@ -534,6 +577,41 @@ export const en: Strings = {
     exampleQuote: '"Lea, 6, over the moon to see herself as the hero!"',
     badgeIllustrated: 'Illustrated',
     badgeRealName: 'Real name',
+  },
+  howItWorks: {
+    title: 'How it works',
+    intro: 'From the first idea to the book in their hands, in 5 simple steps.',
+    steps: [
+      {
+        title: 'Tell us about your hero',
+        description:
+          'Name, age, personality traits, adventure world and graphic style: it all shapes a character that looks like them.',
+      },
+      {
+        title: 'Add a personal touch',
+        description:
+          'A story idea, a photo, appearance details, or secondary characters (family, friends, a favorite toy...) — all optional.',
+      },
+      {
+        title: 'See a free sneak peek',
+        description:
+          'In moments, we generate a character sheet, the cover and the first page — no commitment required.',
+      },
+      {
+        title: 'Choose your format and order',
+        description:
+          'Digital or printed book, sign in to your account, then payment: your card is simply authorized, not charged yet.',
+      },
+      {
+        title: 'Receive your book',
+        description:
+          'Full generation takes up to 30 minutes. You get an email as soon as it’s ready — that’s the moment your card is actually charged.',
+      },
+    ],
+    disclaimerTitle: 'What about payment?',
+    disclaimer:
+      'When you order, we simply authorize your card — like a pre-booking. It’s only charged once the book is fully generated and ready to read, at the moment the confirmation email arrives.',
+    cta: 'Create the book →',
   },
   wizard: {
     stepLabel: (step, total, title) => `STEP ${step} / ${total} — ${title}`,

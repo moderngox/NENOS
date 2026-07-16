@@ -3,6 +3,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { BookDraftProvider } from './context/BookDraftContext';
 import { AuthProvider } from './context/AuthContext';
 import { Landing } from './pages/Landing';
+import { HowItWorks } from './pages/HowItWorks';
 import { CreateWizard } from './pages/create/CreateWizard';
 import { Revelation } from './pages/Revelation';
 import { Payment } from './pages/Payment';
@@ -22,6 +23,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Landing />} />
+              <Route path="/comment-ca-marche" element={<HowItWorks />} />
               <Route path="/creer" element={<Navigate to="/creer/1" replace />} />
               <Route path="/creer/:step" element={<CreateWizard />} />
               <Route path="/revelation" element={<Revelation />} />
