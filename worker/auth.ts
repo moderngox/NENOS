@@ -57,12 +57,21 @@ export async function createSession(db: D1Database, userId: string): Promise<{ t
   return { token, expiresAt };
 }
 
-export function sessionCookieHeader(token: string, expiresAt: string): string {
-  return `${SESSION_COOKIE}=${token}; HttpOnly; Secure; SameSite=Lax; Path=/; Expires=${new Date(expiresAt).toUTCString()}`;
+// Browsers silently refuse to store `Secure` cookies over a plain http://
+// connection — `wrangler dev` serves local dev over http://localhost, so
+// hardcoding `Secure` there means the cookie is never actually set (breaking
+// login, and breaking OAuth's CSRF-state cookie in particular). Only add it
+// when actually served over https.
+export function isSecureRequest(request: Request): boolean {
+  return new URL(request.url).protocol === "https:";
 }
 
-export function clearSessionCookieHeader(): string {
-  return `${SESSION_COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`;
+export function sessionCookieHeader(token: string, expiresAt: string, secure: boolean): string {
+  return `${SESSION_COOKIE}=${token}; HttpOnly;${secure ? " Secure;" : ""} SameSite=Lax; Path=/; Expires=${new Date(expiresAt).toUTCString()}`;
+}
+
+export function clearSessionCookieHeader(secure: boolean): string {
+  return `${SESSION_COOKIE}=;${secure ? " Secure;" : ""} HttpOnly; SameSite=Lax; Path=/; Max-Age=0`;
 }
 
 function readCookie(request: Request, name: string): string | null {

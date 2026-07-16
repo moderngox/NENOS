@@ -1,4 +1,4 @@
-import { createSession, sessionCookieHeader } from "../auth";
+import { createSession, isSecureRequest, sessionCookieHeader } from "../auth";
 import { createUser, findUserByOAuthIdentity, getUserByEmail, linkOAuthIdentity } from "../users-db";
 
 type Provider = "google" | "facebook";
@@ -7,15 +7,19 @@ const OAUTH_STATE_COOKIE = "oauth_state";
 const OAUTH_RETURN_TO_COOKIE = "oauth_return_to";
 const DEFAULT_RETURN_TO = "/paiement";
 
-function shortLivedCookie(name: string, value: string): string {
+// Browsers silently drop `Secure` cookies over a plain http:// connection —
+// `wrangler dev` serves local dev that way, so hardcoding `Secure` here means
+// this CSRF-state cookie is never actually set locally, and the callback
+// always fails its state check. Only add it when actually served over https.
+function shortLivedCookie(name: string, value: string, secure: boolean): string {
   // 10 minutes is plenty to complete a provider's login dialog; HttpOnly +
   // SameSite=Lax since the callback is a top-level GET redirect from the
   // provider's domain (Lax still sends the cookie on that navigation).
-  return `${name}=${encodeURIComponent(value)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=600`;
+  return `${name}=${encodeURIComponent(value)}; HttpOnly;${secure ? " Secure;" : ""} SameSite=Lax; Path=/; Max-Age=600`;
 }
 
-function clearShortLivedCookie(name: string): string {
-  return `${name}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`;
+function clearShortLivedCookie(name: string, secure: boolean): string {
+  return `${name}=;${secure ? " Secure;" : ""} HttpOnly; SameSite=Lax; Path=/; Max-Age=0`;
 }
 
 function readCookie(request: Request, name: string): string | null {
@@ -125,10 +129,11 @@ export async function handleOAuthStart(provider: Provider, request: Request, env
   const returnTo = url.searchParams.get("returnTo") || DEFAULT_RETURN_TO;
   const state = crypto.randomUUID();
   const redirectUri = `${url.origin}/api/auth/${provider}/callback`;
+  const secure = isSecureRequest(request);
 
   const headers = new Headers({ Location: authorizeUrl(provider, env, redirectUri, state) });
-  headers.append("Set-Cookie", shortLivedCookie(OAUTH_STATE_COOKIE, state));
-  headers.append("Set-Cookie", shortLivedCookie(OAUTH_RETURN_TO_COOKIE, returnTo));
+  headers.append("Set-Cookie", shortLivedCookie(OAUTH_STATE_COOKIE, state, secure));
+  headers.append("Set-Cookie", shortLivedCookie(OAUTH_RETURN_TO_COOKIE, returnTo, secure));
   return new Response(null, { status: 302, headers });
 }
 
@@ -138,8 +143,9 @@ export async function handleOAuthCallback(provider: Provider, request: Request, 
   const state = url.searchParams.get("state");
   const expectedState = readCookie(request, OAUTH_STATE_COOKIE);
   const returnTo = readCookie(request, OAUTH_RETURN_TO_COOKIE) || DEFAULT_RETURN_TO;
+  const secure = isSecureRequest(request);
 
-  const clearCookies = [clearShortLivedCookie(OAUTH_STATE_COOKIE), clearShortLivedCookie(OAUTH_RETURN_TO_COOKIE)];
+  const clearCookies = [clearShortLivedCookie(OAUTH_STATE_COOKIE, secure), clearShortLivedCookie(OAUTH_RETURN_TO_COOKIE, secure)];
 
   if (!code || !state || !expectedState || state !== expectedState) {
     return redirect(`${returnTo}?authError=invalid_state`, clearCookies);
@@ -165,7 +171,7 @@ export async function handleOAuthCallback(provider: Provider, request: Request, 
     }
 
     const { token, expiresAt } = await createSession(env.DB, user.id);
-    return redirect(returnTo, [sessionCookieHeader(token, expiresAt), ...clearCookies]);
+    return redirect(returnTo, [sessionCookieHeader(token, expiresAt, secure), ...clearCookies]);
   } catch (err) {
     return redirect(`${returnTo}?authError=${encodeURIComponent((err as Error).message)}`, clearCookies);
   }

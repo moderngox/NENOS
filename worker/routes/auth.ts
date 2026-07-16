@@ -1,4 +1,4 @@
-import { createSession, deleteSession, getSessionUser, hashPassword, sessionCookieHeader, clearSessionCookieHeader, verifyPassword } from "../auth";
+import { createSession, deleteSession, getSessionUser, hashPassword, isSecureRequest, sessionCookieHeader, clearSessionCookieHeader, verifyPassword } from "../auth";
 import { createUser, getUserByEmail } from "../users-db";
 
 function jsonResponse(body: unknown, status = 200, headers?: Record<string, string>): Response {
@@ -31,7 +31,7 @@ export async function handleSignup(request: Request, env: Env): Promise<Response
   return jsonResponse(
     { user: { id: user.id, email: user.email, name: user.name } },
     200,
-    { "Set-Cookie": sessionCookieHeader(token, expiresAt) }
+    { "Set-Cookie": sessionCookieHeader(token, expiresAt, isSecureRequest(request)) }
   );
 }
 
@@ -51,13 +51,13 @@ export async function handleLogin(request: Request, env: Env): Promise<Response>
   return jsonResponse(
     { user: { id: user.id, email: user.email, name: user.name } },
     200,
-    { "Set-Cookie": sessionCookieHeader(token, expiresAt) }
+    { "Set-Cookie": sessionCookieHeader(token, expiresAt, isSecureRequest(request)) }
   );
 }
 
 export async function handleLogout(request: Request, env: Env): Promise<Response> {
   await deleteSession(request, env);
-  return jsonResponse({ ok: true }, 200, { "Set-Cookie": clearSessionCookieHeader() });
+  return jsonResponse({ ok: true }, 200, { "Set-Cookie": clearSessionCookieHeader(isSecureRequest(request)) });
 }
 
 export async function handleMe(request: Request, env: Env): Promise<Response> {
