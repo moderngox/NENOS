@@ -110,3 +110,19 @@ ${STYLE_CORE}
 
 ${NEGATIVE_QUALITY}`;
 }
+
+export function buildBackCoverPrompt(params: { universe: string; scene?: string }): string {
+  const { universe, scene } = params;
+  const defaultScene = `A calm, wide establishing view of the same world as the front cover, evoking the story without repeating its central moment. The protagonist may appear small and distant, or be omitted entirely — this is a quiet backdrop, not a character portrait.`;
+  return `Generate a single children's storybook BACK COVER illustration.
+
+Environment: ${universeDescription(universe)}.
+
+Scene: ${scene || defaultScene}.
+
+Leave a large, uncluttered, softly lit area (plain sky, calm water, or soft out-of-focus foliage) reserved for a paragraph of synopsis text to be added afterward as a separate typography layer. Do not render any text, letters, numbers, logos, barcodes or watermarks inside the image itself.
+
+${STYLE_CORE}
+
+${NEGATIVE_QUALITY}`;
+}

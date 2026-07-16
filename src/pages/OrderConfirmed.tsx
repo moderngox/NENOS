@@ -16,10 +16,15 @@ export function OrderConfirmed() {
         </div>
         <p style={{ font: '600 14px/1.6 Geist', color: 'var(--ink-soft)', marginBottom: 28 }}>{t.orderConfirmed.message}</p>
         {bookId && (
-          <p style={{ font: '600 11px Geist', color: 'var(--muted)', marginBottom: 28 }}>
-            {'ID: '}
-            {bookId}
-          </p>
+          <>
+            <Link to={`/livre/${bookId}`} className="cta" style={{ display: 'inline-block', marginBottom: 14 }}>
+              {t.orderConfirmed.viewBook}
+            </Link>
+            <p style={{ font: '600 11px Geist', color: 'var(--muted)', marginBottom: 20 }}>
+              {'ID: '}
+              {bookId}
+            </p>
+          </>
         )}
         <Link to="/" className="cta-secondary" style={{ display: 'inline-block' }}>
           {t.orderConfirmed.backHome}

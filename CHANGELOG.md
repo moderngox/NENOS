@@ -4,6 +4,97 @@ Two days of work spanning the `poc-imagegen` validation prototype and the
 real `nenosapp` product (React + Cloudflare Workers). Organized by day, then
 by feature area.
 
+## Day 3 — 2026-07-16 (cont'd): full generation, reader, PDF, accounts
+
+### Full high-quality generation, slide/carousel reader, PDF export
+
+- **`POST /api/books/:id/generate-next`**: the paid product's full-book
+  generation, previously just a `TODO`. Relocks a fresh *high-quality*
+  character sheet and regenerates all 13 assets (character sheet, front
+  cover, 10 pages, back cover) from it — deliberately not reusing the
+  low-quality sneak-peek assets, so a paying customer never sees a mix of
+  qualities. One unit per call, resumable and idempotent (a `generating`
+  lock in D1 prevents duplicate concurrent work), matching the sneak-peek's
+  already-validated pattern. Stored under a separate `full/` R2 prefix.
+  Verified against a real test book: all 13 assets generated, survived a
+  dev-server crash mid-request and an OpenAI billing-limit interruption
+  without losing progress or duplicating work.
+- **Fixed a real timeout bug found during that test**: high-quality
+  generations with reference images routinely took 170–210s, past
+  `image-client.ts`'s 180s default — causing spurious timeouts and wasted
+  retries against the real, billed API. Bumped to a 280s timeout for the
+  full-quality path.
+- **`GET /api/books/:id`**: a full snapshot (payment status, story text,
+  generation progress, asset URLs) so the reader works from a fresh tab with
+  no client-side state at all — a returning customer's browser won't have
+  any.
+- **Slide/carousel reader** at `/livre/:bookId` (`BookReader.tsx`): three
+  states — not-paid gating message, live progress view while generating, and
+  the finished carousel (front cover, 10 pages, back cover) with prev/next,
+  dot navigation, and keyboard arrow support. Interior pages show narration
+  in a panel below the image rather than overlaid on it, since the image
+  prompt's reserved "safe zone" isn't guaranteed to land in a predictable
+  spot. Found and fixed a real overlap bug where a two-line title collided
+  with the subtitle on the front-cover slide (fixed positioning didn't
+  account for wrapped text; switched to a flex column so they stack
+  naturally).
+- **PDF export** via `pdf-lib` + `@pdf-lib/fontkit` (`worker/pdf.ts`,
+  `GET /api/books/:id/pdf`) — no `nodejs_compat` flag needed, contrary to
+  the one open question going in. Same Baloo 2 / Poppins fonts as the image
+  covers, bundled into the Worker as `Data` modules (`wrangler.jsonc`'s
+  `rules`) rather than fetched from R2 at request time. Verified by
+  rendering the generated PDF's pages to images (via a throwaway
+  `pdfjs-dist` + `@napi-rs/canvas` script) and inspecting them directly —
+  confirmed correct 12-page output, legible text, and no missing fonts or
+  images.
+
+### User accounts, deferred payment, background generation, email
+
+- **Real accounts**: email/password (PBKDF2-SHA256 password hashing via Web
+  Crypto, no bcrypt dependency) plus Google and Facebook OAuth
+  (`worker/routes/oauth.ts`) — hand-rolled authorization-code-flow exchanges
+  via `fetch`, no SDK, matching how this app already talks to Stripe/OpenAI.
+  Sign in with Apple is deferred — it needs a paid Apple Developer account
+  and a private-key-signed client secret, a real prerequisite only the user
+  can set up; the code is structured so it slots into the same pattern
+  later. Session state lives in an `HttpOnly` cookie backed by a new
+  `sessions` table, not client-visible storage.
+- **Signup/login moved to the payment step**, not the start of the wizard —
+  no signup friction to try the wizard or sneak peek; an account is only
+  required once the customer is ready to pay (`AuthForm.tsx`, embedded in
+  `Payment.tsx` and on a new standalone `/connexion` page).
+- **Deferred payment**: Stripe Checkout now authorizes the card
+  (`capture_method: manual`) instead of charging immediately — verified via
+  the real Stripe API that a created session's PaymentIntent actually came
+  back with `capture_method: manual`. The webhook stores the PaymentIntent
+  id and marks the book `authorized` (not `paid`); the real charge happens
+  later, once the book is actually ready.
+- **Cron-triggered background generation** (`worker/scheduled.ts`, a
+  Cloudflare Cron Trigger firing every minute — available on the free plan,
+  unlike Queues): drives `generate-next`'s same one-unit-per-call logic
+  forward regardless of whether any browser tab is open. This is what makes
+  "you'll get an email even if you close this tab" true rather than
+  aspirational. Verified directly: triggered the scheduled handler with no
+  browser involved at all, confirmed it advanced a real authorized test
+  book's progress on its own.
+- **Capture + notify on completion**: once a book's generation finishes, the
+  scheduled handler captures the held PaymentIntent
+  (`markBookCaptured`/`markBookCaptureFailed` — a failed capture leaves the
+  book reachable rather than stranding a customer who already has a
+  generated book) and emails the customer via Resend
+  (`worker/email.ts`, plain `fetch`, no SDK). Currently a no-op with a
+  logged warning until a real `RESEND_API_KEY` is provided.
+- **Real order history**: `GET /api/me/books` + a rewritten `Library.tsx`
+  replace what were previously two permanently-hardcoded example cards.
+  Verified live: signed up, logged in, saw the real purchased book at its
+  actual generation progress, logged out, confirmed the session was
+  actually cleared (reverted to the signed-out view on reload).
+- **Disclaimers added in both places that make sense**: a short one-liner
+  on the pre-payment sneak-peek page (`Revelation.tsx`) and the full
+  "up to 30 minutes, you'll be charged once it's ready" message on the
+  post-checkout confirmation page (`OrderConfirmed.tsx`), replacing its
+  previous vaguer copy.
+
 ## Day 1 — 2026-07-15: validating the AI generation pipeline (`poc-imagegen`)
 
 Built as a standalone Node PoC before touching the real app, to prove the
@@ -99,13 +190,19 @@ image-generation approach cheaply before wiring it into a website.
 
 ## What's still explicitly deferred
 
-- Full (10-page) high-quality generation trigger on payment success — the
-  hook point is marked with a `TODO` in `worker/db.ts`'s `markBookPaid`.
-- `Library.tsx` real persistence (still hardcoded example cards).
+- **Sign in with Apple** — needs a paid Apple Developer account and a
+  private-key-signed client secret; only the user can set this up.
+- **Real Google/Facebook/Resend credentials** — all three integrations are
+  fully wired but return a clear "not configured" response (or, for email,
+  a logged warning) until real API keys/app credentials are provided, the
+  same way `OPENAI_API_KEY`/`STRIPE_SECRET_KEY` were handled earlier.
+- **No "forgot password" flow** and **no email verification on signup** —
+  both real gaps, not silently pretended away.
+- **No admin UI for `capture_failed` orders** — the book stays reachable
+  (it was already generated, real cost incurred) but a failed Stripe capture
+  currently needs a manual Dashboard follow-up.
 - Multi-currency Stripe Checkout (EUR only for now).
-- The `satori`/`resvg-wasm` port of the text compositor for the real
-  downloadable PDF (Cloudflare Workers can't run `@napi-rs/canvas`, which
-  `poc-imagegen` uses — fine there since it's a Node-only prototype).
-- Real Cloudflare deployment (`wrangler login` + real D1/R2 provisioning —
-  everything so far has been validated against local `wrangler dev`
-  emulation only).
+- Real Cloudflare deployment of this round's work (`wrangler login` + real
+  D1/R2 provisioning — validated against local `wrangler dev` emulation
+  only so far; the *previous* round, up through the payment module, was
+  already verified live in production).

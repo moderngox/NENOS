@@ -205,8 +205,11 @@ export function Revelation() {
               <Link to="/paiement" className="cta" style={{ fontSize: 18, padding: '15px 0', width: '100%', marginBottom: 8 }}>
                 {t.revelation.unlockCta(price)}
               </Link>
-              <p style={{ textAlign: 'center', font: '700 11px Geist', color: 'var(--muted)', margin: 0 }}>
+              <p style={{ textAlign: 'center', font: '700 11px Geist', color: 'var(--muted)', margin: '0 0 10px' }}>
                 {t.revelation.pagesCaption}
+              </p>
+              <p style={{ textAlign: 'center', font: '600 11px Geist', color: 'var(--muted)', margin: 0 }}>
+                {t.revelation.disclaimer}
               </p>
             </div>
           </div>

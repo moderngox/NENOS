@@ -1,4 +1,5 @@
-import { getBook, markBookCheckoutStarted } from "../db";
+import { getBook, markBookCheckoutStarted, stampBookUser } from "../db";
+import { getSessionUser } from "../auth";
 
 // EUR only for now — the UI shows a €/$ symbol per language but never
 // actually converts currency; unifying on EUR for the real charge is a
@@ -22,8 +23,16 @@ function toFormBody(params: Record<string, string>): string {
 }
 
 export async function handleCreateCheckout(bookId: string, request: Request, env: Env): Promise<Response> {
+  // Signup/login happens right here at the payment step — the wizard and
+  // sneak-peek preview stay open to anyone, but we need an account to
+  // attach the order to (order history, "your book is ready" email).
+  const user = await getSessionUser(request, env);
+  if (!user) return jsonResponse({ error: "You need to be signed in to complete your order." }, 401);
+
   const book = await getBook(env.DB, bookId);
   if (!book) return jsonResponse({ error: "Book not found." }, 404);
+
+  await stampBookUser(env.DB, bookId, user.id);
 
   let format: string;
   try {
@@ -47,6 +56,9 @@ export async function handleCreateCheckout(bookId: string, request: Request, env
     "line_items[0][quantity]": "1",
     "metadata[bookId]": bookId,
     "metadata[format]": format,
+    // Authorizes (holds) the card without charging it — the actual capture
+    // happens later, once the book is ready (worker/scheduled.ts).
+    "payment_intent_data[capture_method]": "manual",
   });
 
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {

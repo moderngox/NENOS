@@ -1,4 +1,4 @@
-import { markBookPaid } from "../db";
+import { markBookAuthorized } from "../db";
 
 // Stripe's v1 signing scheme: header is "t=<timestamp>,v1=<hex>,...",
 // signed payload is "<timestamp>.<raw body>", HMAC-SHA256 with the webhook
@@ -39,7 +39,10 @@ export async function handleStripeWebhook(request: Request, env: Env): Promise<R
     return new Response("Invalid signature", { status: 400 });
   }
 
-  let event: { type?: string; data?: { object?: { metadata?: { bookId?: string } } } };
+  let event: {
+    type?: string;
+    data?: { object?: { metadata?: { bookId?: string }; payment_intent?: string } };
+  };
   try {
     event = JSON.parse(rawBody);
   } catch {
@@ -48,7 +51,10 @@ export async function handleStripeWebhook(request: Request, env: Env): Promise<R
 
   if (event.type === "checkout.session.completed") {
     const bookId = event.data?.object?.metadata?.bookId;
-    if (bookId) await markBookPaid(env.DB, bookId);
+    const paymentIntentId = event.data?.object?.payment_intent;
+    // The card is authorized (held), not charged yet — see checkout.ts's
+    // capture_method: manual and worker/scheduled.ts's capture-on-ready.
+    if (bookId && paymentIntentId) await markBookAuthorized(env.DB, bookId, paymentIntentId);
   }
 
   return new Response(null, { status: 200 });

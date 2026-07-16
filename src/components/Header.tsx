@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import logoMark from '../assets/logo-mark.png';
 import { LanguageToggle } from './LanguageToggle';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 interface HeaderProps {
   variant?: 'light' | 'dark';
@@ -12,6 +13,7 @@ interface HeaderProps {
 
 export function Header({ variant = 'light', showNav = false, activeNav, cta }: HeaderProps) {
   const { t } = useLanguage();
+  const { user, logout } = useAuth();
   const dark = variant === 'dark';
 
   return (
@@ -70,7 +72,17 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
               >
                 {t.nav.myBooks}
               </Link>
-              <span>{t.nav.account}</span>
+              {user ? (
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  style={{ background: 'none', border: 'none', font: 'inherit', color: 'inherit', cursor: 'pointer', padding: 0 }}
+                >
+                  {t.auth.logout}
+                </button>
+              ) : (
+                <Link to="/connexion">{t.auth.login}</Link>
+              )}
             </>
           ) : (
             <>

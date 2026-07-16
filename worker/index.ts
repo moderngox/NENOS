@@ -1,10 +1,21 @@
 import { handleCreateBook } from "./routes/books";
 import { handleGeneratePreview } from "./routes/preview";
-import { handleGetAsset } from "./routes/assets";
+import { handleGetAsset, handleGetFullAsset } from "./routes/assets";
 import { handleCreateCheckout } from "./routes/checkout";
 import { handleStripeWebhook } from "./routes/stripe-webhook";
+import { handleGenerateNext } from "./routes/generate-next";
+import { handleGetBookStatus } from "./routes/book-status";
+import { handleGetPdf } from "./routes/pdf";
+import { handleSignup, handleLogin, handleLogout, handleMe } from "./routes/auth";
+import { handleGetMyBooks } from "./routes/me-books";
+import { handleOAuthStart, handleOAuthCallback } from "./routes/oauth";
+import { handleScheduled } from "./scheduled";
 
 export default {
+  async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(handleScheduled(env));
+  },
+
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const parts = url.pathname.split("/").filter(Boolean); // ["api", "books", ...]
@@ -17,6 +28,33 @@ export default {
       return handleStripeWebhook(request, env);
     }
 
+    if (url.pathname === "/api/auth/signup" && request.method === "POST") {
+      return handleSignup(request, env);
+    }
+    if (url.pathname === "/api/auth/login" && request.method === "POST") {
+      return handleLogin(request, env);
+    }
+    if (url.pathname === "/api/auth/logout" && request.method === "POST") {
+      return handleLogout(request, env);
+    }
+    if (url.pathname === "/api/me" && request.method === "GET") {
+      return handleMe(request, env);
+    }
+    if (url.pathname === "/api/me/books" && request.method === "GET") {
+      return handleGetMyBooks(request, env);
+    }
+
+    // /api/auth/:provider/start and /api/auth/:provider/callback
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "auth" && (parts[2] === "google" || parts[2] === "facebook")) {
+      if (parts[3] === "start" && request.method === "GET") return handleOAuthStart(parts[2], request, env);
+      if (parts[3] === "callback" && request.method === "GET") return handleOAuthCallback(parts[2], request, env);
+    }
+
+    // /api/books/:id
+    if (parts.length === 3 && parts[0] === "api" && parts[1] === "books" && request.method === "GET") {
+      return handleGetBookStatus(parts[2], env);
+    }
+
     // /api/books/:id/preview
     if (parts.length === 4 && parts[0] === "api" && parts[1] === "books" && parts[3] === "preview" && request.method === "POST") {
       return handleGeneratePreview(parts[2], env);
@@ -27,9 +65,24 @@ export default {
       return handleCreateCheckout(parts[2], request, env);
     }
 
+    // /api/books/:id/generate-next
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "books" && parts[3] === "generate-next" && request.method === "POST") {
+      return handleGenerateNext(parts[2], env);
+    }
+
     // /api/books/:id/assets/:filename
     if (parts.length === 5 && parts[0] === "api" && parts[1] === "books" && parts[3] === "assets" && request.method === "GET") {
       return handleGetAsset(parts[2], parts[4], env);
+    }
+
+    // /api/books/:id/full-assets/:filename
+    if (parts.length === 5 && parts[0] === "api" && parts[1] === "books" && parts[3] === "full-assets" && request.method === "GET") {
+      return handleGetFullAsset(parts[2], parts[4], env);
+    }
+
+    // /api/books/:id/pdf
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "books" && parts[3] === "pdf" && request.method === "GET") {
+      return handleGetPdf(parts[2], env);
     }
 
     return env.ASSETS.fetch(request);

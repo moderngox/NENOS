@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Header } from '../components/Header';
 import { useLanguage } from '../context/LanguageContext';
 import { useBookDraft } from '../context/BookDraftContext';
+import { useAuth } from '../context/AuthContext';
+import { AuthForm } from '../components/AuthForm';
 
 const UNIVERSE_LABELS: Record<string, { fr: string; en: string }> = {
   space: { fr: 'Espace', en: 'Space' },
@@ -12,6 +14,7 @@ const UNIVERSE_LABELS: Record<string, { fr: string; en: string }> = {
 export function Payment() {
   const { t, lang } = useLanguage();
   const { draft, story, preview } = useBookDraft();
+  const { user } = useAuth();
   const [format, setFormat] = useState<'print' | 'digital'>('print');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -146,13 +149,20 @@ export function Payment() {
             <span style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 17, color: 'var(--ink)' }}>{t.payment.total}</span>
             <span style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 24, color: 'var(--ink)' }}>{total}</span>
           </div>
-          <button type="button" className="cta" style={{ marginBottom: 10 }} onClick={handlePay} disabled={submitting}>
-            {submitting ? t.payment.redirecting : t.payment.cta}
-          </button>
-          {error && (
-            <p style={{ textAlign: 'center', font: '600 12px Geist', color: 'var(--red, #d33)', margin: '0 0 10px' }}>{error}</p>
+          {user ? (
+            <>
+              <p style={{ font: '600 12px Geist', color: 'var(--muted)', marginBottom: 10 }}>{t.auth.loggedInAs(user.email)}</p>
+              <button type="button" className="cta" style={{ marginBottom: 10 }} onClick={handlePay} disabled={submitting}>
+                {submitting ? t.payment.redirecting : t.payment.cta}
+              </button>
+              {error && (
+                <p style={{ textAlign: 'center', font: '600 12px Geist', color: 'var(--red, #d33)', margin: '0 0 10px' }}>{error}</p>
+              )}
+              <p style={{ textAlign: 'center', font: '600 12px Geist', color: 'var(--muted)', margin: 0 }}>{t.payment.security}</p>
+            </>
+          ) : (
+            <AuthForm returnTo="/paiement" />
           )}
-          <p style={{ textAlign: 'center', font: '600 12px Geist', color: 'var(--muted)', margin: 0 }}>{t.payment.security}</p>
         </div>
       </div>
     </div>

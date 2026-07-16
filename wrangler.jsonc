@@ -21,5 +21,24 @@
 			"binding": "PHOTOS",
 			"bucket_name": "nenos-photos"
 		}
-	]
+	],
+	// Bundles the .ttf files under worker/fonts/ as ArrayBuffers at build time
+	// (for pdf-lib font embedding) instead of needing an R2 round-trip for
+	// static assets that never change per-request.
+	"rules": [
+		{ "type": "Data", "globs": ["**/*.ttf"] }
+	],
+	// Not a secret — the production origin, needed to build links in emails
+	// sent from the scheduled handler (which has no incoming Request to
+	// derive an origin from). Overridden to http://localhost:8787 in
+	// .dev.vars for local runs.
+	"vars": {
+		"APP_BASE_URL": "https://nenos23.moderngox.workers.dev"
+	},
+	// Drives full-book generation forward once a minute regardless of
+	// whether any browser tab is open — see worker/scheduled.ts. Available
+	// on the free Workers plan (unlike Queues).
+	"triggers": {
+		"crons": ["* * * * *"]
+	}
 }

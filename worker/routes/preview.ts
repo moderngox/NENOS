@@ -15,7 +15,7 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-function mimeForKey(key: string): string {
+export function mimeForKey(key: string): string {
   const ext = key.toLowerCase().split(".").pop();
   if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
   if (ext === "webp") return "image/webp";
@@ -25,7 +25,7 @@ function mimeForKey(key: string): string {
 // image #1 is always the main character sheet; secondary characters with a
 // real uploaded photo get appended as additional reference images (#2, #3,
 // ...) so the model can use their real likeness instead of text alone.
-async function loadSecondaryCharacterPhotos(
+export async function loadSecondaryCharacterPhotos(
   env: Env,
   secondaryCharacters: SecondaryCharacterDraft[]
 ): Promise<{ images: ImageInput[]; photoRefIndex: Map<string, number> }> {
@@ -48,7 +48,7 @@ async function loadSecondaryCharacterPhotos(
   return { images, photoRefIndex };
 }
 
-function traitsSummary(draft: {
+export function traitsSummary(draft: {
   traits: string[];
   skinColor: string | null;
   hairColor: string | null;

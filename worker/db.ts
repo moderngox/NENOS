@@ -73,6 +73,11 @@ interface BookRow {
   back_cover: string | null;
   preview_status: string;
   preview_assets: string | null;
+  payment_status: string;
+  full_status: string;
+  full_units_done: number;
+  user_id: string | null;
+  stripe_payment_intent_id: string | null;
 }
 
 export async function getBook(db: D1Database, bookId: string): Promise<StoredBook | null> {
@@ -106,7 +111,58 @@ export async function getBook(db: D1Database, bookId: string): Promise<StoredBoo
     story,
     previewStatus: row.preview_status,
     previewAssets: row.preview_assets ? JSON.parse(row.preview_assets) : null,
+    paymentStatus: row.payment_status,
+    fullStatus: row.full_status,
+    fullUnitsDone: row.full_units_done,
+    userId: row.user_id,
+    stripePaymentIntentId: row.stripe_payment_intent_id,
   };
+}
+
+export async function getBooksForUser(db: D1Database, userId: string): Promise<StoredBook[]> {
+  const { results } = await db
+    .prepare(`SELECT * FROM books WHERE user_id = ? ORDER BY created_at DESC`)
+    .bind(userId)
+    .all<BookRow>();
+
+  return results.map((row) => {
+    const draft: BookDraftInput = {
+      name: row.name,
+      age: row.age,
+      traits: JSON.parse(row.traits),
+      universe: row.universe,
+      storyPrompt: row.story_prompt,
+      skinColor: row.skin_color,
+      hairColor: row.hair_color,
+      eyeColor: row.eye_color,
+      appearanceDetails: row.appearance_details,
+      secondaryCharacters: JSON.parse(row.secondary_characters),
+      language: row.language,
+    };
+    const story: StoryBeatsResult | null =
+      row.pages && row.front_cover && row.back_cover
+        ? { pages: JSON.parse(row.pages), frontCover: JSON.parse(row.front_cover), backCover: JSON.parse(row.back_cover) }
+        : null;
+    return {
+      id: row.id,
+      draft,
+      photoKey: row.photo_key,
+      status: row.status,
+      story,
+      previewStatus: row.preview_status,
+      previewAssets: row.preview_assets ? JSON.parse(row.preview_assets) : null,
+      paymentStatus: row.payment_status,
+      fullStatus: row.full_status,
+      fullUnitsDone: row.full_units_done,
+      userId: row.user_id,
+      stripePaymentIntentId: row.stripe_payment_intent_id,
+    };
+  });
+}
+
+export async function stampBookUser(db: D1Database, bookId: string, userId: string): Promise<void> {
+  const now = new Date().toISOString();
+  await db.prepare(`UPDATE books SET user_id = ?, updated_at = ? WHERE id = ?`).bind(userId, now, bookId).run();
 }
 
 export async function updateBookPreview(
@@ -135,12 +191,40 @@ export async function markBookCheckoutStarted(
     .run();
 }
 
-export async function markBookPaid(db: D1Database, bookId: string): Promise<void> {
+// Checkout completed — the card is authorized (held), not yet charged.
+// Generation is unlocked from this point (see auth.ts's isPaymentUnlocked);
+// the actual charge happens later, once the book is ready (see db.ts's
+// markBookCaptured, triggered from worker/scheduled.ts).
+export async function markBookAuthorized(db: D1Database, bookId: string, paymentIntentId: string): Promise<void> {
   const now = new Date().toISOString();
   await db
-    .prepare(`UPDATE books SET payment_status = 'paid', updated_at = ? WHERE id = ?`)
-    .bind(now, bookId)
+    .prepare(`UPDATE books SET payment_status = 'authorized', stripe_payment_intent_id = ?, updated_at = ? WHERE id = ?`)
+    .bind(paymentIntentId, now, bookId)
     .run();
-  // TODO: this is the hook point for triggering full-book generation
-  // (remaining 9 pages + back cover, quality: high) — deferred, see plan.
+}
+
+export async function markBookCaptured(db: D1Database, bookId: string): Promise<void> {
+  const now = new Date().toISOString();
+  await db.prepare(`UPDATE books SET payment_status = 'captured', updated_at = ? WHERE id = ?`).bind(now, bookId).run();
+}
+
+// The book was already generated (real cost already incurred) so it stays
+// reachable — this status just flags that the charge itself needs manual
+// follow-up (no admin UI for this yet, a known gap).
+export async function markBookCaptureFailed(db: D1Database, bookId: string): Promise<void> {
+  const now = new Date().toISOString();
+  await db.prepare(`UPDATE books SET payment_status = 'capture_failed', updated_at = ? WHERE id = ?`).bind(now, bookId).run();
+}
+
+export async function updateFullProgress(
+  db: D1Database,
+  bookId: string,
+  status: string,
+  unitsDone: number
+): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare(`UPDATE books SET full_status = ?, full_units_done = ?, updated_at = ? WHERE id = ?`)
+    .bind(status, unitsDone, now, bookId)
+    .run();
 }

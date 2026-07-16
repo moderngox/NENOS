@@ -97,6 +97,25 @@ export interface Strings {
     previewBadge: string;
     pagesCaption: string;
     unlockCta: (price: string) => string;
+    disclaimer: string;
+  };
+  auth: {
+    loginTitle: string;
+    signupTitle: string;
+    emailLabel: string;
+    passwordLabel: string;
+    nameLabel: string;
+    nameOptional: string;
+    loginCta: string;
+    signupCta: string;
+    switchToSignup: string;
+    switchToLogin: string;
+    orDivider: string;
+    continueWithGoogle: string;
+    continueWithFacebook: string;
+    logout: string;
+    loggedInAs: (email: string) => string;
+    login: string;
   };
   payment: {
     title: string;
@@ -115,6 +134,7 @@ export interface Strings {
   orderConfirmed: {
     title: string;
     message: string;
+    viewBook: string;
     backHome: string;
   };
   library: {
@@ -125,6 +145,24 @@ export interface Strings {
     readOnline: string;
     comingSoon: string;
     newBook: string;
+    signedOutMessage: string;
+    emptyMessage: string;
+  };
+  reader: {
+    notPaidTitle: string;
+    notPaidMessage: string;
+    goToPayment: string;
+    generatingTitle: string;
+    generatingProgress: (done: number, total: number) => string;
+    generatingHelper: string;
+    errorMessage: string;
+    retry: string;
+    downloadPdf: string;
+    frontCoverLabel: string;
+    backCoverLabel: string;
+    pageLabel: (page: number, total: number) => string;
+    prev: string;
+    next: string;
   };
 }
 
@@ -303,6 +341,25 @@ export const fr: Strings = {
     previewBadge: 'APERÇU',
     pagesCaption: '32 pages illustrées · PDF + version imprimée en option',
     unlockCta: (price) => `Débloquer le livre complet — ${price}`,
+    disclaimer: 'Après commande, la préparation complète prend jusqu\'à 30 minutes — tu seras prévenu(e) par e-mail dès que ton livre sera prêt.',
+  },
+  auth: {
+    loginTitle: 'Connexion',
+    signupTitle: 'Créer un compte',
+    emailLabel: 'E-mail',
+    passwordLabel: 'Mot de passe',
+    nameLabel: 'Prénom',
+    nameOptional: 'Facultatif',
+    loginCta: 'Se connecter',
+    signupCta: 'Créer mon compte',
+    switchToSignup: 'Pas encore de compte ? Créer un compte',
+    switchToLogin: 'Déjà un compte ? Se connecter',
+    orDivider: 'ou',
+    continueWithGoogle: 'Continuer avec Google',
+    continueWithFacebook: 'Continuer avec Facebook',
+    logout: 'Se déconnecter',
+    loggedInAs: (email) => `Connecté en tant que ${email}`,
+    login: 'Connexion',
   },
   payment: {
     title: 'Ton livre est prêt à être commandé',
@@ -320,7 +377,9 @@ export const fr: Strings = {
   },
   orderConfirmed: {
     title: 'Merci pour ta commande ! 🎉',
-    message: 'Ton livre est en cours de préparation. Tu recevras un e-mail dès qu’il sera prêt.',
+    message:
+      'Ton livre est en cours de préparation, ça peut prendre jusqu\'à 30 minutes. Tu seras prévenu(e) par e-mail dès qu\'il sera prêt — c\'est à ce moment-là que ta carte sera débitée.',
+    viewBook: 'Voir mon livre →',
     backHome: '← Retour à l’accueil',
   },
   library: {
@@ -331,6 +390,24 @@ export const fr: Strings = {
     readOnline: 'Lire en ligne',
     comingSoon: 'Bientôt disponible',
     newBook: '+ Créer un nouveau livre',
+    signedOutMessage: 'Connecte-toi pour voir tes livres.',
+    emptyMessage: 'Tu n’as pas encore de livre. Créons-en un !',
+  },
+  reader: {
+    notPaidTitle: 'Ce livre n’est pas encore disponible',
+    notPaidMessage: 'Finalise ta commande pour débloquer la lecture complète de ce livre.',
+    goToPayment: 'Aller au paiement →',
+    generatingTitle: 'Préparation de ton livre en haute qualité ✨',
+    generatingProgress: (done, total) => `Page ${done} / ${total}`,
+    generatingHelper: 'Cela peut prendre quelques minutes — reste sur cette page.',
+    errorMessage: 'Une erreur est survenue pendant la génération. Réessaie.',
+    retry: 'Réessayer',
+    downloadPdf: 'Télécharger le PDF',
+    frontCoverLabel: 'Couverture',
+    backCoverLabel: 'Fin',
+    pageLabel: (page, total) => `Page ${page} / ${total}`,
+    prev: '← Précédent',
+    next: 'Suivant →',
   },
 };
 
@@ -508,6 +585,25 @@ export const en: Strings = {
     previewBadge: 'PREVIEW',
     pagesCaption: '32 illustrated pages · PDF + optional printed copy',
     unlockCta: (price) => `Unlock the full storybook — ${price}`,
+    disclaimer: "After ordering, full preparation takes up to 30 minutes — you'll get an email as soon as your book is ready.",
+  },
+  auth: {
+    loginTitle: 'Log in',
+    signupTitle: 'Create an account',
+    emailLabel: 'Email',
+    passwordLabel: 'Password',
+    nameLabel: 'First name',
+    nameOptional: 'Optional',
+    loginCta: 'Log in',
+    signupCta: 'Create my account',
+    switchToSignup: "Don't have an account? Sign up",
+    switchToLogin: 'Already have an account? Log in',
+    orDivider: 'or',
+    continueWithGoogle: 'Continue with Google',
+    continueWithFacebook: 'Continue with Facebook',
+    logout: 'Log out',
+    loggedInAs: (email) => `Signed in as ${email}`,
+    login: 'Log in',
   },
   payment: {
     title: 'Your book is ready to order',
@@ -525,7 +621,9 @@ export const en: Strings = {
   },
   orderConfirmed: {
     title: 'Thank you for your order! 🎉',
-    message: "Your book is being prepared. You'll get an email as soon as it's ready.",
+    message:
+      "Your book is being prepared, which can take up to 30 minutes. You'll get an email as soon as it's ready — that's when your card will be charged.",
+    viewBook: 'View my book →',
     backHome: '← Back to home',
   },
   library: {
@@ -536,6 +634,24 @@ export const en: Strings = {
     readOnline: 'Read online',
     comingSoon: 'Coming soon',
     newBook: '+ Create a new book',
+    signedOutMessage: 'Log in to see your books.',
+    emptyMessage: "You don't have any books yet. Let's create one!",
+  },
+  reader: {
+    notPaidTitle: 'This book isn’t available yet',
+    notPaidMessage: 'Complete your order to unlock the full reading experience.',
+    goToPayment: 'Go to payment →',
+    generatingTitle: 'Preparing your book in high quality ✨',
+    generatingProgress: (done, total) => `Page ${done} / ${total}`,
+    generatingHelper: 'This can take a few minutes — stay on this page.',
+    errorMessage: 'Something went wrong during generation. Please try again.',
+    retry: 'Retry',
+    downloadPdf: 'Download the PDF',
+    frontCoverLabel: 'Cover',
+    backCoverLabel: 'The end',
+    pageLabel: (page, total) => `Page ${page} / ${total}`,
+    prev: '← Previous',
+    next: 'Next →',
   },
 };
 

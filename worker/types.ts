@@ -66,4 +66,9 @@ export interface StoredBook {
   story: StoryBeatsResult | null;
   previewStatus: string;
   previewAssets: PreviewAssets | null;
+  paymentStatus: string;
+  fullStatus: string;
+  fullUnitsDone: number;
+  userId: string | null;
+  stripePaymentIntentId: string | null;
 }

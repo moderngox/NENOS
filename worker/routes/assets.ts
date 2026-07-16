@@ -22,3 +22,22 @@ export async function handleGetAsset(bookId: string, filename: string, env: Env)
     },
   });
 }
+
+// Same validation as handleGetAsset, for the paid, high-quality assets
+// stored under the book's `full/` R2 prefix (kept distinct from the free
+// preview so the two qualities can never collide or be confused).
+export async function handleGetFullAsset(bookId: string, filename: string, env: Env): Promise<Response> {
+  if (!/^[a-z0-9-]+\.png$/i.test(filename)) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const object = await env.PHOTOS.get(`${bookId}/full/${filename}`);
+  if (!object) return new Response("Not found", { status: 404 });
+
+  return new Response(object.body, {
+    headers: {
+      "Content-Type": object.httpMetadata?.contentType || mimeForKey(filename),
+      "Cache-Control": "private, max-age=3600",
+    },
+  });
+}
