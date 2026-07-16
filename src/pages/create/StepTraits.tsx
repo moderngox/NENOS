@@ -5,6 +5,8 @@ import universePirates from '../../assets/universe-pirates.png';
 import universeSpace from '../../assets/universe-space.png';
 import universeForest from '../../assets/universe-forest.png';
 import heroChild from '../../assets/hero-child.png';
+import premiumThumb from '../../assets/Premium.jpeg';
+import manhwaThumb from '../../assets/manwha.png';
 
 const UNIVERSE_IMAGES: Record<string, string> = {
   pirates: universePirates,
@@ -13,9 +15,9 @@ const UNIVERSE_IMAGES: Record<string, string> = {
 };
 
 const STYLE_IMAGES: Record<string, string> = {
-  pixar: heroChild,
-  comic: '/exemples/lea-dragon-etoiles/05.jpg',
-  manhwa: '/style-thumbnails/manhwa.png',
+  pixar: premiumThumb,
+  comic: heroChild,
+  manhwa: manhwaThumb,
 };
 
 export function StepTraits() {
