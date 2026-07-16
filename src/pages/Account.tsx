@@ -215,20 +215,10 @@ export function Account() {
                     </Link>
                   </div>
                 ) : book.paymentUnlocked ? (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                      <span className="spinner" style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--border)', borderTopColor: 'var(--ink)', display: 'inline-block' }} />
-                      <span style={{ font: '600 11px Geist', color: 'var(--muted)' }}>
-                        {book.fullUnitsDone}/{book.fullUnitsTotal}
-                      </span>
-                    </div>
-                    <Link
-                      to={`/livre/${book.bookId}`}
-                      style={{ display: 'block', textAlign: 'center', width: '100%', font: '600 12px Geist', background: 'var(--gray-bg)', color: 'var(--ink)', border: 'none', borderRadius: 8, padding: '9px 0', textDecoration: 'none' }}
-                    >
-                      {t.account.readOnline}
-                    </Link>
-                  </>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', font: '600 12px Geist', background: 'var(--gray-bg)', color: 'var(--muted)', border: 'none', borderRadius: 8, padding: '9px 0' }}>
+                    <span className="spinner" style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid var(--border)', borderTopColor: 'var(--muted)', display: 'inline-block' }} />
+                    {t.account.preparing(book.fullUnitsDone, book.fullUnitsTotal)}
+                  </div>
                 ) : (
                   <button type="button" disabled style={{ width: '100%', font: '600 12px Geist', background: 'var(--gray-bg)', color: '#aaa', border: 'none', borderRadius: 8, padding: '9px 0' }}>
                     {t.account.comingSoon}

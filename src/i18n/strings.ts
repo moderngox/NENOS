@@ -181,6 +181,7 @@ export interface Strings {
     readOnline: string;
     downloadPdf: string;
     comingSoon: string;
+    preparing: (done: number, total: number) => string;
     logout: string;
   };
 }
@@ -444,6 +445,7 @@ export const fr: Strings = {
     readOnline: 'Lire en ligne',
     downloadPdf: 'Télécharger PDF',
     comingSoon: 'Bientôt disponible',
+    preparing: (done, total) => `En préparation — ${done}/${total}`,
     logout: 'Se déconnecter',
   },
 };
@@ -706,6 +708,7 @@ export const en: Strings = {
     readOnline: 'Read online',
     downloadPdf: 'Download PDF',
     comingSoon: 'Coming soon',
+    preparing: (done, total) => `Preparing — ${done}/${total}`,
     logout: 'Log out',
   },
 };
