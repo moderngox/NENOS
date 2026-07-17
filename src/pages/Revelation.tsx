@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Header } from '../components/Header';
+import { GenerationModal } from '../components/GenerationModal';
 import { useLanguage } from '../context/LanguageContext';
 import { useBookDraft } from '../context/BookDraftContext';
 
@@ -49,6 +50,13 @@ export function Revelation() {
   return (
     <div className="screen">
       <Header variant="light" />
+      <GenerationModal
+        open={isGenerating}
+        title={t.revelation.generatingTitle}
+        waitMessage={t.generationModal.waitMessage}
+        steps={t.revelation.generatingSteps}
+        tips={t.generationModal.tips}
+      />
 
       <div className="container" style={{ padding: '32px 22px 40px' }}>
         <div className="revelation-layout" style={{ display: 'flex', gap: 60, alignItems: 'center', flexWrap: 'wrap' }}>

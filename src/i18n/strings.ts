@@ -120,6 +120,12 @@ export interface Strings {
     pagesCaption: string;
     unlockCta: (price: string) => string;
     disclaimer: string;
+    generatingTitle: string;
+    generatingSteps: string[];
+  };
+  generationModal: {
+    waitMessage: string;
+    tips: string[];
   };
   auth: {
     loginTitle: string;
@@ -231,6 +237,8 @@ export interface Strings {
   avatarReady: {
     title: string;
     generatingMessage: (name: string) => string;
+    generatingTitle: string;
+    generatingSteps: string[];
     readyTitle: (name: string) => string;
     readyMessage: string;
     viewProfileCta: string;
@@ -483,6 +491,18 @@ export const fr: Strings = {
     pagesCaption: '32 pages illustrées · PDF + version imprimée en option',
     unlockCta: (price) => `Débloquer le livre complet — ${price}`,
     disclaimer: 'Après commande, la préparation complète prend jusqu\'à 30 minutes — tu seras prévenu(e) par e-mail dès que ton livre sera prêt.',
+    generatingTitle: 'Ton histoire prend vie...',
+    generatingSteps: ['Création de la fiche de personnage', 'Composition de la couverture du livre', 'Illustration de la première page'],
+  },
+  generationModal: {
+    waitMessage: 'Cela peut prendre jusqu\'à 2 minutes ⏳',
+    tips: [
+      'Chaque histoire est unique : ton enfant devient le héros de sa propre aventure.',
+      'Astuce : une photo nette, prise de face et bien éclairée, donne les meilleurs résultats.',
+      'Ton héros peut explorer l\'espace, la forêt enchantée, les mers pirates et bien d\'autres univers.',
+      'Une fois prêt, ton livre est lisible en ligne et téléchargeable en PDF.',
+      'Nos illustrateurs IA peaufinent chaque détail : encore un instant !',
+    ],
   },
   auth: {
     loginTitle: 'Connexion',
@@ -594,6 +614,8 @@ export const fr: Strings = {
   avatarReady: {
     title: 'Ton héros prend vie ! ✨',
     generatingMessage: (name) => `On dessine ${name}...`,
+    generatingTitle: 'Création en cours...',
+    generatingSteps: ['Analyse de la photo et des traits', 'Création de la fiche de personnage', 'Peinture du portrait final'],
     readyTitle: (name) => `Voici ${name} !`,
     readyMessage: 'Connecte-toi pour enregistrer son profil et le retrouver dans ton espace.',
     viewProfileCta: 'Voir mon profil →',
@@ -845,6 +867,18 @@ export const en: Strings = {
     pagesCaption: '32 illustrated pages · PDF + optional printed copy',
     unlockCta: (price) => `Unlock the full storybook — ${price}`,
     disclaimer: "After ordering, full preparation takes up to 30 minutes — you'll get an email as soon as your book is ready.",
+    generatingTitle: 'Your story is coming to life...',
+    generatingSteps: ['Creating the character sheet', 'Composing the book cover', 'Illustrating the first page'],
+  },
+  generationModal: {
+    waitMessage: 'This can take up to 2 minutes ⏳',
+    tips: [
+      'Every story is unique: your child becomes the hero of their own adventure.',
+      'Tip: a sharp, front-facing, well-lit photo gives the best results.',
+      'Your hero can explore outer space, an enchanted forest, pirate seas and more.',
+      'Once ready, your book can be read online or downloaded as a PDF.',
+      "Our AI illustrators are polishing every detail — almost there!",
+    ],
   },
   auth: {
     loginTitle: 'Log in',
@@ -956,6 +990,8 @@ export const en: Strings = {
   avatarReady: {
     title: 'Your hero comes to life! ✨',
     generatingMessage: (name) => `Drawing ${name}...`,
+    generatingTitle: 'Creating...',
+    generatingSteps: ['Analyzing the photo and traits', 'Creating the character sheet', 'Painting the final portrait'],
     readyTitle: (name) => `Meet ${name}!`,
     readyMessage: 'Sign in to save their profile and find it in your account.',
     viewProfileCta: 'View my profile →',

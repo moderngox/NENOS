@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { AuthForm } from '../components/AuthForm';
+import { GenerationModal } from '../components/GenerationModal';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -107,17 +108,17 @@ export function AvatarReady() {
   return (
     <div className="screen">
       <Header variant="light" />
+      <GenerationModal
+        open={status === 'loading' || status === 'generating'}
+        title={t.avatarReady.generatingTitle}
+        waitMessage={t.generationModal.waitMessage}
+        steps={t.avatarReady.generatingSteps}
+        tips={t.generationModal.tips}
+      />
       <div className="container" style={{ padding: '60px 22px', textAlign: 'center', maxWidth: 440, margin: '0 auto' }}>
         <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 24 }}>
           {t.avatarReady.title}
         </div>
-
-        {(status === 'loading' || status === 'generating') && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-            <Spinner />
-            <span style={{ font: '700 14px Geist', color: 'var(--ink)' }}>{t.avatarReady.generatingMessage(name || '...')}</span>
-          </div>
-        )}
 
         {status === 'error' && <p style={{ font: '600 14px/1.6 Geist', color: 'var(--red, #d33)' }}>{t.avatarReady.errorMessage}</p>}
 
