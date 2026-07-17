@@ -28,6 +28,7 @@ export async function handleGetMyBooks(request: Request, env: Env): Promise<Resp
       fullStatus: book.fullStatus,
       fullUnitsDone: book.fullUnitsDone,
       fullUnitsTotal: (book.story?.pages.length ?? 10) + 3,
+      pdfReady: book.pdfStatus === "ready",
     })),
   });
 }

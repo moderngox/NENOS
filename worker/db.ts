@@ -78,6 +78,8 @@ interface BookRow {
   payment_status: string;
   full_status: string;
   full_units_done: number;
+  pdf_status: string;
+  pdf_units_done: number;
   user_id: string | null;
   stripe_payment_intent_id: string | null;
   format: string | null;
@@ -117,6 +119,8 @@ function mapRowToStoredBook(row: BookRow): StoredBook {
     paymentStatus: row.payment_status,
     fullStatus: row.full_status,
     fullUnitsDone: row.full_units_done,
+    pdfStatus: row.pdf_status,
+    pdfUnitsDone: row.pdf_units_done,
     userId: row.user_id,
     stripePaymentIntentId: row.stripe_payment_intent_id,
     format: row.format,
@@ -205,6 +209,19 @@ export async function updateFullProgress(
   const now = new Date().toISOString();
   await db
     .prepare(`UPDATE books SET full_status = ?, full_units_done = ?, updated_at = ? WHERE id = ?`)
+    .bind(status, unitsDone, now, bookId)
+    .run();
+}
+
+export async function updatePdfProgress(
+  db: D1Database,
+  bookId: string,
+  status: string,
+  unitsDone: number
+): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare(`UPDATE books SET pdf_status = ?, pdf_units_done = ?, updated_at = ? WHERE id = ?`)
     .bind(status, unitsDone, now, bookId)
     .run();
 }

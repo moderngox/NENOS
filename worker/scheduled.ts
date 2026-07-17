@@ -1,12 +1,18 @@
 import { getBook, markBookCaptured, markBookCaptureFailed } from "./db";
 import { getUserById } from "./users-db";
 import { generateNextUnit } from "./routes/generate-next";
+import { buildPdfNextUnit } from "./routes/build-pdf-next";
 import { sendEmail, bookReadyEmailHtml } from "./email";
 
 // Bounds how much work one cron tick takes on — each unit is a real,
 // billed, 3-4 minute OpenAI call, so this keeps a single scheduled
 // invocation from trying to drive an unbounded number of books at once.
 const MAX_BOOKS_PER_TICK = 5;
+// PDF-build units do real synchronous CPU work (WASM image transcoding,
+// pdf-lib assembly) rather than mostly-awaited network calls, so this stays
+// deliberately small — processing many books' worth in one tick would risk
+// re-creating the same CPU-budget problem this pipeline exists to avoid.
+const MAX_PDF_BOOKS_PER_TICK = 3;
 
 async function captureStripePayment(env: Env, paymentIntentId: string): Promise<boolean> {
   const response = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/capture`, {
@@ -56,5 +62,15 @@ export async function handleScheduled(env: Env): Promise<void> {
     if (result.ok && result.fullStatus === "ready") {
       await captureAndNotify(row.id, env);
     }
+  }
+
+  const { results: pdfRows } = await env.DB.prepare(
+    `SELECT id FROM books WHERE full_status = 'ready' AND pdf_status != 'ready' ORDER BY updated_at ASC LIMIT ?`
+  )
+    .bind(MAX_PDF_BOOKS_PER_TICK)
+    .all<{ id: string }>();
+
+  for (const row of pdfRows) {
+    await buildPdfNextUnit(row.id, env);
   }
 }

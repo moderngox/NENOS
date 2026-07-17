@@ -17,6 +17,7 @@ interface MyBook {
   fullStatus: string;
   fullUnitsDone: number;
   fullUnitsTotal: number;
+  pdfReady: boolean;
 }
 
 type Tab = 'orders' | 'books';
@@ -212,12 +213,21 @@ export function Account() {
 
                 {book.fullStatus === 'ready' ? (
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <a
-                      href={`/api/books/${book.bookId}/pdf`}
-                      style={{ flex: 1, textAlign: 'center', font: '600 12px Geist', color: '#fff', background: 'var(--ink)', border: 'none', borderRadius: 8, padding: '9px 0', textDecoration: 'none' }}
-                    >
-                      {t.account.downloadPdf}
-                    </a>
+                    {book.pdfReady ? (
+                      <a
+                        href={`/api/books/${book.bookId}/pdf`}
+                        style={{ flex: 1, textAlign: 'center', font: '600 12px Geist', color: '#fff', background: 'var(--ink)', border: 'none', borderRadius: 8, padding: '9px 0', textDecoration: 'none' }}
+                      >
+                        {t.account.downloadPdf}
+                      </a>
+                    ) : (
+                      <div
+                        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, font: '600 12px Geist', background: 'var(--gray-bg)', color: 'var(--muted)', borderRadius: 8, padding: '9px 0' }}
+                      >
+                        <span className="spinner" style={{ width: 11, height: 11, borderRadius: '50%', border: '2px solid var(--border)', borderTopColor: 'var(--muted)', display: 'inline-block' }} />
+                        {t.account.pdfPreparing}
+                      </div>
+                    )}
                     <Link
                       to={`/livre/${book.bookId}`}
                       style={{ flex: 1, textAlign: 'center', font: '600 12px Geist', color: 'var(--ink)', background: '#fff', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 0', textDecoration: 'none' }}

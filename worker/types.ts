@@ -70,6 +70,8 @@ export interface StoredBook {
   paymentStatus: string;
   fullStatus: string;
   fullUnitsDone: number;
+  pdfStatus: string;
+  pdfUnitsDone: number;
   userId: string | null;
   stripePaymentIntentId: string | null;
   format: string | null;

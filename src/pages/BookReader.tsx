@@ -18,6 +18,7 @@ interface BookStatus {
   fullUnitsDone: number;
   fullUnitsTotal: number;
   fullAssets: { coverFrontUrl: string; coverBackUrl: string; pageUrls: string[] } | null;
+  pdfReady: boolean;
 }
 
 function Spinner() {
@@ -228,9 +229,16 @@ export function BookReader() {
           <span style={{ font: '700 13px Geist', color: 'var(--muted)' }}>
             {isFront ? t.reader.frontCoverLabel : isBack ? t.reader.backCoverLabel : t.reader.pageLabel(pageIndex + 1, story.pages.length)}
           </span>
-          <a href={`/api/books/${bookId}/pdf`} className="cta-secondary" style={{ width: 'auto', padding: '8px 16px', fontSize: 13 }}>
-            {t.reader.downloadPdf}
-          </a>
+          {status.pdfReady ? (
+            <a href={`/api/books/${bookId}/pdf`} className="cta-secondary" style={{ width: 'auto', padding: '8px 16px', fontSize: 13 }}>
+              {t.reader.downloadPdf}
+            </a>
+          ) : (
+            <span style={{ font: '600 12px Geist', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span className="spinner" style={{ width: 11, height: 11, borderRadius: '50%', border: '2px solid var(--border)', borderTopColor: 'var(--muted)', display: 'inline-block' }} />
+              {t.account.pdfPreparing}
+            </span>
+          )}
         </div>
 
         <div

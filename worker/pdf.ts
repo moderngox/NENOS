@@ -3,14 +3,17 @@ import fontkit from "@pdf-lib/fontkit";
 import baloo2Bytes from "./fonts/Baloo2[wght].ttf";
 import poppinsMediumBytes from "./fonts/Poppins-Medium.ttf";
 import poppinsSemiBoldBytes from "./fonts/Poppins-SemiBold.ttf";
-import { pngToJpeg } from "./image-compress";
 
 export interface BookPdfInput {
   frontCover: { title: string; subtitle: string };
   backCover: { synopsis: string };
   pages: { text: string }[];
-  // Fetched one at a time (not pre-loaded) so only one source PNG is ever
-  // live in memory at once — see image-compress.ts for why.
+  // Already-JPEG bytes (see worker/routes/build-pdf-next.ts, which
+  // pre-compresses each page via image-compress.ts's WASM codec as its own
+  // cron-driven unit) — this assembly step only does cheap pdf-lib work
+  // (embedJpg, not decode+re-encode), which is what keeps it inside the
+  // Workers Free plan's 10ms-per-request CPU budget. Fetched one at a time
+  // so only one image is ever live in memory at once.
   getCoverFrontBytes: () => Promise<ArrayBuffer>;
   getCoverBackBytes: () => Promise<ArrayBuffer>;
   getPageBytes: (pageIndex: number) => Promise<ArrayBuffer>;
@@ -43,8 +46,7 @@ function wrapText(font: PDFFont, text: string, size: number, maxWidth: number): 
   return lines;
 }
 
-async function drawFullBleedImage(pdfDoc: PDFDocument, page: PDFPage, pngBytes: ArrayBuffer) {
-  const jpegBytes = await pngToJpeg(pngBytes);
+async function drawFullBleedImage(pdfDoc: PDFDocument, page: PDFPage, jpegBytes: ArrayBuffer) {
   const image = await pdfDoc.embedJpg(jpegBytes);
   page.drawImage(image, { x: 0, y: 0, width: PAGE_WIDTH, height: PAGE_HEIGHT });
 }

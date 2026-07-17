@@ -16,6 +16,7 @@ interface OrderDetailData {
   fullStatus: string;
   fullUnitsDone: number;
   fullUnitsTotal: number;
+  pdfReady: boolean;
 }
 
 function formatPrice(cents: number, lang: 'fr' | 'en'): string {
@@ -125,13 +126,23 @@ export function OrderDetail() {
 
             {order.fullStatus === 'ready' && (
               <div style={{ display: 'flex', gap: 8 }}>
-                <a
-                  href={`/api/books/${order.bookId}/pdf`}
-                  className="cta"
-                  style={{ flex: 1, textAlign: 'center', textDecoration: 'none' }}
-                >
-                  {t.account.downloadPdf}
-                </a>
+                {order.pdfReady ? (
+                  <a
+                    href={`/api/books/${order.bookId}/pdf`}
+                    className="cta"
+                    style={{ flex: 1, textAlign: 'center', textDecoration: 'none' }}
+                  >
+                    {t.account.downloadPdf}
+                  </a>
+                ) : (
+                  <div
+                    className="cta-secondary"
+                    style={{ flex: 1, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: 'var(--muted)' }}
+                  >
+                    <span className="spinner" style={{ width: 11, height: 11, borderRadius: '50%', border: '2px solid var(--border)', borderTopColor: 'var(--muted)', display: 'inline-block' }} />
+                    {t.account.pdfPreparing}
+                  </div>
+                )}
                 <Link to={`/livre/${order.bookId}`} className="cta-secondary" style={{ flex: 1, textAlign: 'center', textDecoration: 'none' }}>
                   {t.account.readOnline}
                 </Link>

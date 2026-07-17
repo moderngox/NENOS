@@ -203,6 +203,7 @@ export interface Strings {
     downloadPdf: string;
     comingSoon: string;
     preparing: (done: number, total: number) => string;
+    pdfPreparing: string;
     logout: string;
   };
   orderDetail: {
@@ -535,6 +536,7 @@ export const fr: Strings = {
     downloadPdf: 'Télécharger PDF',
     comingSoon: 'Bientôt disponible',
     preparing: (done, total) => `En préparation — ${done}/${total}`,
+    pdfPreparing: 'PDF en préparation…',
     logout: 'Se déconnecter',
   },
   orderDetail: {
@@ -866,6 +868,7 @@ export const en: Strings = {
     downloadPdf: 'Download PDF',
     comingSoon: 'Coming soon',
     preparing: (done, total) => `Preparing — ${done}/${total}`,
+    pdfPreparing: 'Preparing PDF…',
     logout: 'Log out',
   },
   orderDetail: {

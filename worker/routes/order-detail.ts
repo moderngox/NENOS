@@ -65,5 +65,6 @@ export async function handleGetOrderDetail(bookId: string, request: Request, env
     fullStatus: book.fullStatus,
     fullUnitsDone: book.fullUnitsDone,
     fullUnitsTotal: pageCount + 3,
+    pdfReady: book.pdfStatus === "ready",
   });
 }
