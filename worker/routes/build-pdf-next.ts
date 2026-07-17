@@ -91,3 +91,20 @@ export async function buildPdfNextUnit(bookId: string, env: Env): Promise<BuildP
     return { ok: false, status: 502, error: `PDF build failed: ${(err as Error).message}` };
   }
 }
+
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+// Lets a client that already has the reader/account page open (like
+// generate-next.ts's client-side polling for image generation) nudge PDF
+// assembly forward instead of waiting solely on the once-a-minute cron.
+export async function handleBuildPdfNext(bookId: string, env: Env): Promise<Response> {
+  const result = await buildPdfNextUnit(bookId, env);
+  if (!result.ok) return jsonResponse({ error: result.error }, result.status);
+  if (result.pdfStatus === "generating") return jsonResponse(result, 202);
+  return jsonResponse(result);
+}

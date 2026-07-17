@@ -4,6 +4,7 @@ import { handleGetAsset, handleGetFullAsset } from "./routes/assets";
 import { handleCreateCheckout } from "./routes/checkout";
 import { handleStripeWebhook } from "./routes/stripe-webhook";
 import { handleGenerateNext } from "./routes/generate-next";
+import { handleBuildPdfNext } from "./routes/build-pdf-next";
 import { handleGetBookStatus } from "./routes/book-status";
 import { handleGetPdf } from "./routes/pdf";
 import { handleSignup, handleLogin, handleLogout, handleMe } from "./routes/auth";
@@ -74,6 +75,11 @@ export default {
     // /api/books/:id/generate-next
     if (parts.length === 4 && parts[0] === "api" && parts[1] === "books" && parts[3] === "generate-next" && request.method === "POST") {
       return handleGenerateNext(parts[2], env);
+    }
+
+    // /api/books/:id/build-pdf-next
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "books" && parts[3] === "build-pdf-next" && request.method === "POST") {
+      return handleBuildPdfNext(parts[2], env);
     }
 
     // /api/books/:id/assets/:filename
