@@ -1,6 +1,6 @@
 import { getBook, updatePdfProgress } from "../db";
 import { isPaymentUnlocked } from "../auth";
-import { pngToJpeg } from "../image-compress";
+import { decodePngToRaw, encodeRawToJpeg } from "../image-compress";
 import { buildBookPdf } from "../pdf";
 
 // Same lock-staleness reasoning as generate-next.ts's STALE_LOCK_MS — a
@@ -9,21 +9,25 @@ import { buildBookPdf } from "../pdf";
 // window is enough.
 const STALE_LOCK_MS = 5 * 60 * 1000;
 
-type Unit = { kind: "compress"; filename: string } | { kind: "assemble" };
+type Unit = { kind: "decode" | "encode"; filename: string } | { kind: "assemble" };
 
 // Mirrors generate-next.ts's image plan (minus the character sheet, which
-// isn't part of the book PDF), plus one final "assemble" unit. Splitting the
-// expensive part (WASM PNG->JPEG transcoding, one image per unit) from the
-// cheap part (embedding already-small JPEGs into a PDF) is what keeps every
-// single unit under the Workers Free plan's 10ms CPU budget — assembling a
-// whole book's worth of images in one request blew well past that limit,
-// even with JPEG-sized images (see worker/pdf.ts's history).
+// isn't part of the book PDF), plus one final "assemble" unit. Each image's
+// PNG->JPEG transcode is itself split into a "decode" and "encode" step
+// (round-tripping the raw pixels through R2's `full-raw/` prefix) rather
+// than one combined unit — doing both in a single request occasionally
+// exceeded the Workers Free plan's CPU budget on some images (a hard kill
+// the caller's try/catch can't see, leaving the book stuck retrying the
+// same unit forever). Splitting roughly halves the CPU cost of any one
+// request. The final "assemble" unit (embedding already-small JPEGs into a
+// PDF) is cheap by comparison.
 function buildPlan(pageCount: number): Unit[] {
-  const plan: Unit[] = [{ kind: "compress", filename: "cover-front.png" }];
-  for (let i = 0; i < pageCount; i++) {
-    plan.push({ kind: "compress", filename: `page-${String(i + 1).padStart(2, "0")}.png` });
+  const filenames = ["cover-front.png", ...Array.from({ length: pageCount }, (_, i) => `page-${String(i + 1).padStart(2, "0")}.png`), "cover-back.png"];
+  const plan: Unit[] = [];
+  for (const filename of filenames) {
+    plan.push({ kind: "decode", filename });
+    plan.push({ kind: "encode", filename });
   }
-  plan.push({ kind: "compress", filename: "cover-back.png" });
   plan.push({ kind: "assemble" });
   return plan;
 }
@@ -57,13 +61,20 @@ export async function buildPdfNextUnit(bookId: string, env: Env): Promise<BuildP
   await updatePdfProgress(env.DB, bookId, "generating", book.pdfUnitsDone);
 
   try {
-    if (unit.kind === "compress") {
+    if (unit.kind === "decode") {
       const object = await env.PHOTOS.get(`${bookId}/full/${unit.filename}`);
       if (!object) throw new Error(`Missing source image: ${unit.filename}`);
       const pngBytes = await object.arrayBuffer();
-      const jpegBytes = await pngToJpeg(pngBytes);
+      const rawBytes = await decodePngToRaw(pngBytes);
+      await env.PHOTOS.put(`${bookId}/full-raw/${unit.filename}.raw`, rawBytes);
+    } else if (unit.kind === "encode") {
+      const object = await env.PHOTOS.get(`${bookId}/full-raw/${unit.filename}.raw`);
+      if (!object) throw new Error(`Missing decoded pixels: ${unit.filename}`);
+      const rawBytes = await object.arrayBuffer();
+      const jpegBytes = await encodeRawToJpeg(rawBytes);
       const jpegFilename = unit.filename.replace(/\.png$/, ".jpg");
       await env.PHOTOS.put(`${bookId}/full-jpeg/${jpegFilename}`, jpegBytes, { httpMetadata: { contentType: "image/jpeg" } });
+      await env.PHOTOS.delete(`${bookId}/full-raw/${unit.filename}.raw`);
     } else {
       async function getCompressedBytes(filename: string): Promise<ArrayBuffer> {
         const object = await env.PHOTOS.get(`${bookId}/full-jpeg/${filename}`);

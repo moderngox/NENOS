@@ -10,6 +10,13 @@
 // embedding shrinks each image roughly 5-10x, and doing it one image at a
 // time (see pdf.ts) keeps peak memory to about one image's worth instead of
 // the whole book's.
+//
+// Decode and encode are exposed as two separate steps (rather than one
+// combined pngToJpeg call) because doing both in a single request
+// occasionally exceeded the Workers Free plan's CPU budget — a hard kill
+// that bypasses the caller's try/catch, leaving PDF builds stuck retrying
+// the same unit forever (see worker/routes/build-pdf-next.ts). Splitting
+// the work roughly halves the CPU cost of any one request.
 import { init as initPngDecode, decode as decodePng } from "@jsquash/png/decode.js";
 import encodeJpeg, { init as initJpegEncode } from "@jsquash/jpeg/encode.js";
 // Wrangler's bundler needs a literal relative path to resolve .wasm modules
@@ -54,8 +61,25 @@ function ensureInit(): Promise<void> {
   return initPromise;
 }
 
-export async function pngToJpeg(pngBytes: ArrayBuffer, quality = 82): Promise<ArrayBuffer> {
+// Packs decoded pixel data as [uint32 width][uint32 height][raw RGBA bytes]
+// — a throwaway intermediate format, only ever written to and read back
+// from R2's `full-raw/` prefix between the decode and encode units.
+export async function decodePngToRaw(pngBytes: ArrayBuffer): Promise<ArrayBuffer> {
   await ensureInit();
   const imageData = await decodePng(pngBytes);
+  const packed = new Uint8Array(8 + imageData.data.byteLength);
+  new DataView(packed.buffer).setUint32(0, imageData.width, true);
+  new DataView(packed.buffer).setUint32(4, imageData.height, true);
+  packed.set(imageData.data, 8);
+  return packed.buffer;
+}
+
+export async function encodeRawToJpeg(rawBytes: ArrayBuffer, quality = 82): Promise<ArrayBuffer> {
+  await ensureInit();
+  const view = new DataView(rawBytes);
+  const width = view.getUint32(0, true);
+  const height = view.getUint32(4, true);
+  const data = new Uint8ClampedArray(rawBytes, 8);
+  const imageData = new ImageData(data, width, height);
   return encodeJpeg(imageData, { quality });
 }
