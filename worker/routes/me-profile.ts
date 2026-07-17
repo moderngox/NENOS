@@ -57,12 +57,16 @@ export async function handleGetMyProfile(request: Request, env: Env): Promise<Re
   const readyBooks = qualifying.filter((b) => b.fullStatus === "ready");
   const readyAvatarBooks = avatarBooks.filter((b) => b.avatarStatus === "ready");
 
-  let avatarUrl: string | null = null;
-  if (readyBooks.length > 0) {
-    avatarUrl = `/api/books/${readyBooks[0].id}/full-assets/portrait.png`;
-  } else if (readyAvatarBooks.length > 0) {
-    avatarUrl = `/api/books/${readyAvatarBooks[0].id}/assets/portrait.png`;
-  }
+  // Whichever ready portrait is the most recent wins — a paid book generated
+  // before the portrait unit existed has no portrait.png, so blindly
+  // preferring "paid over free" would point at a missing asset instead of a
+  // perfectly good newer avatar-only portrait.
+  const portraitSource = [...readyBooks, ...readyAvatarBooks].sort(byCreatedAtDesc)[0];
+  const avatarUrl = portraitSource
+    ? portraitSource.kind === "book"
+      ? `/api/books/${portraitSource.id}/full-assets/portrait.png`
+      : `/api/books/${portraitSource.id}/assets/portrait.png`
+    : null;
 
   const universeCounts = new Map<string, number>();
   for (const b of qualifying) {

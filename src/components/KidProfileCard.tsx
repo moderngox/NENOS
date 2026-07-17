@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import unknownAvatar from '../assets/unknownAvatar.svg';
+import unknownAvatar from '../assets/unknownAvatar.png';
 
 function findLabel(list: { id: string; label: string }[], id: string | null): string | null {
   if (!id) return null;

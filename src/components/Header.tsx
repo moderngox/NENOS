@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logoMark from '../assets/logo-mark.png';
-import unknownAvatar from '../assets/unknownAvatar.svg';
+import unknownAvatar from '../assets/unknownAvatar.png';
 import { LanguageToggle } from './LanguageToggle';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
