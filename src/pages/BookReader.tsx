@@ -120,6 +120,35 @@ export function BookReader() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmingPayment, status?.paymentUnlocked, status?.fullStatus === 'ready', bookId, retryTick]);
 
+  // Once the book's images are done, drive PDF assembly the same way —
+  // the cron path alone has a known reliability gap for this kind of
+  // sustained work, so a page with the book open nudges it forward too.
+  useEffect(() => {
+    if (status?.fullStatus !== 'ready' || status.pdfReady) return;
+    let stop = false;
+    (async () => {
+      while (!stop) {
+        try {
+          const response = await fetch(`/api/books/${bookId}/build-pdf-next`, { method: 'POST' });
+          const body = (await response.json().catch(() => null)) as { pdfStatus?: string; error?: string } | null;
+          if (!response.ok && response.status !== 202) return;
+          if (stop) return;
+          if (body?.pdfStatus === 'ready') {
+            setStatus((prev) => (prev ? { ...prev, pdfReady: true } : prev));
+            return;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 4000));
+        } catch {
+          return;
+        }
+      }
+    })();
+    return () => {
+      stop = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status?.fullStatus === 'ready', status?.pdfReady, bookId]);
+
   const totalSlides = status?.story ? status.story.pages.length + 2 : 0;
 
   useEffect(() => {
