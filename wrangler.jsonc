@@ -33,9 +33,11 @@
 	],
 	// Bundles the .ttf files under worker/fonts/ as ArrayBuffers at build time
 	// (for pdf-lib font embedding) instead of needing an R2 round-trip for
-	// static assets that never change per-request.
+	// static assets that never change per-request. The .wasm rule is for
+	// jSquash's PNG/JPEG codecs (see worker/image-compress.ts).
 	"rules": [
-		{ "type": "Data", "globs": ["**/*.ttf"] }
+		{ "type": "Data", "globs": ["**/*.ttf"] },
+		{ "type": "CompiledWasm", "globs": ["**/*.wasm"] }
 	],
 	// Not a secret — the production origin, needed to build links in emails
 	// sent from the scheduled handler (which has no incoming Request to

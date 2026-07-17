@@ -11,6 +11,8 @@
     "dev:worker": "npm run build && wrangler dev"
   },
   "dependencies": {
+    "@jsquash/jpeg": "^1.6.0",
+    "@jsquash/png": "^3.1.1",
     "@pdf-lib/fontkit": "^1.1.1",
     "pdf-lib": "^1.17.1",
     "react": "^19.2.7",

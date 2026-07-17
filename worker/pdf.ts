@@ -3,14 +3,17 @@ import fontkit from "@pdf-lib/fontkit";
 import baloo2Bytes from "./fonts/Baloo2[wght].ttf";
 import poppinsMediumBytes from "./fonts/Poppins-Medium.ttf";
 import poppinsSemiBoldBytes from "./fonts/Poppins-SemiBold.ttf";
+import { pngToJpeg } from "./image-compress";
 
 export interface BookPdfInput {
   frontCover: { title: string; subtitle: string };
   backCover: { synopsis: string };
   pages: { text: string }[];
-  coverFrontBytes: ArrayBuffer;
-  coverBackBytes: ArrayBuffer;
-  pageBytes: ArrayBuffer[]; // same order/length as `pages`
+  // Fetched one at a time (not pre-loaded) so only one source PNG is ever
+  // live in memory at once — see image-compress.ts for why.
+  getCoverFrontBytes: () => Promise<ArrayBuffer>;
+  getCoverBackBytes: () => Promise<ArrayBuffer>;
+  getPageBytes: (pageIndex: number) => Promise<ArrayBuffer>;
 }
 
 // Matches the source images' 1024x1536 (2:3) aspect ratio exactly.
@@ -40,8 +43,9 @@ function wrapText(font: PDFFont, text: string, size: number, maxWidth: number): 
   return lines;
 }
 
-async function drawFullBleedImage(pdfDoc: PDFDocument, page: PDFPage, bytes: ArrayBuffer) {
-  const image = await pdfDoc.embedPng(bytes);
+async function drawFullBleedImage(pdfDoc: PDFDocument, page: PDFPage, pngBytes: ArrayBuffer) {
+  const jpegBytes = await pngToJpeg(pngBytes);
+  const image = await pdfDoc.embedJpg(jpegBytes);
   page.drawImage(image, { x: 0, y: 0, width: PAGE_WIDTH, height: PAGE_HEIGHT });
 }
 
@@ -85,7 +89,7 @@ export async function buildBookPdf(input: BookPdfInput): Promise<Uint8Array> {
   // Front cover
   {
     const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
-    await drawFullBleedImage(pdfDoc, page, input.coverFrontBytes);
+    await drawFullBleedImage(pdfDoc, page, await input.getCoverFrontBytes());
 
     const titleSize = 28;
     const titleLines = wrapText(titleFont, input.frontCover.title, titleSize, PAGE_WIDTH - MARGIN * 2);
@@ -114,7 +118,7 @@ export async function buildBookPdf(input: BookPdfInput): Promise<Uint8Array> {
   // Interior pages
   for (let i = 0; i < input.pages.length; i++) {
     const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
-    await drawFullBleedImage(pdfDoc, page, input.pageBytes[i]);
+    await drawFullBleedImage(pdfDoc, page, await input.getPageBytes(i));
 
     const textSize = 12.5;
     const lineHeight = textSize * 1.5;
@@ -137,7 +141,7 @@ export async function buildBookPdf(input: BookPdfInput): Promise<Uint8Array> {
   // Back cover
   {
     const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
-    await drawFullBleedImage(pdfDoc, page, input.coverBackBytes);
+    await drawFullBleedImage(pdfDoc, page, await input.getCoverBackBytes());
 
     const textSize = 12.5;
     const lineHeight = textSize * 1.5;
