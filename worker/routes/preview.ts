@@ -8,6 +8,15 @@ const PREVIEW_QUALITY = "low"; // cheap by design — this triggers on every wiz
 const CHARACTER_SIZE = "1024x1024";
 const PAGE_SIZE = "1024x1536";
 
+// Same lock-staleness reasoning as generate-next.ts's STALE_LOCK_MS — without
+// this, a request that dies mid-generation (a Worker CPU/time kill, a
+// crashed OpenAI call) leaves previewStatus stuck at "generating" forever:
+// the idempotency check above would defer to it indefinitely, and nobody
+// ever retries. Three sequential low-quality image calls normally finish in
+// well under a minute, so 5 minutes is a generous "this is definitely dead"
+// threshold.
+const STALE_LOCK_MS = 5 * 60 * 1000;
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -72,8 +81,10 @@ export async function handleGeneratePreview(bookId: string, env: Env): Promise<R
   }
   // A previous call already kicked off generation (possibly interrupted
   // client-side by a reload, but still running server-side) — report back
-  // instead of starting a second, duplicate, paid generation run.
-  if (book.previewStatus === "generating") {
+  // instead of starting a second, duplicate, paid generation run. Unless
+  // that lock is older than STALE_LOCK_MS, in which case the previous
+  // attempt is presumed dead and we fall through to retry.
+  if (book.previewStatus === "generating" && Date.now() - new Date(book.updatedAt).getTime() < STALE_LOCK_MS) {
     return jsonResponse({ previewStatus: "generating" }, 202);
   }
 

@@ -12,6 +12,11 @@ import { mimeForKey, traitsSummary } from "./preview";
 const AVATAR_QUALITY = "low";
 const CHARACTER_SIZE = "1024x1024";
 
+// Same lock-staleness reasoning as preview.ts's STALE_LOCK_MS — without
+// this, a request that dies mid-generation leaves avatarStatus stuck at
+// "generating" forever with no way to retry.
+const STALE_LOCK_MS = 5 * 60 * 1000;
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -120,7 +125,7 @@ export async function handleGenerateAvatar(bookId: string, env: Env): Promise<Re
   if (book.avatarStatus === "ready") {
     return jsonResponse({ avatarStatus: "ready" });
   }
-  if (book.avatarStatus === "generating") {
+  if (book.avatarStatus === "generating" && Date.now() - new Date(book.updatedAt).getTime() < STALE_LOCK_MS) {
     return jsonResponse({ avatarStatus: "generating" }, 202);
   }
 
