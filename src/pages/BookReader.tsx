@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Header } from '../components/Header';
+import { BackButton } from '../components/BackButton';
 import { useLanguage } from '../context/LanguageContext';
 
 interface StoryBeat {
@@ -254,6 +255,7 @@ export function BookReader() {
     <div className="screen">
       <Header variant="light" />
       <div className="container" style={{ padding: '24px 22px 40px', maxWidth: 720, margin: '0 auto' }}>
+        <BackButton fallback="/mon-compte?tab=books" />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
           <span style={{ font: '700 13px Geist', color: 'var(--muted)' }}>
             {isFront ? t.reader.frontCoverLabel : isBack ? t.reader.backCoverLabel : t.reader.pageLabel(pageIndex + 1, story.pages.length)}
