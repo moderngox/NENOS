@@ -9,14 +9,15 @@ import { StepAge } from './StepAge';
 import { StepTraits } from './StepTraits';
 import { StepPhoto } from './StepPhoto';
 import { StepAppearance } from './StepAppearance';
-import { StepSecondaryCharacters } from './StepSecondaryCharacters';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 5;
 
 // A shorter alternative to the full book wizard — same draft fields, minus
-// the story prompt (steps here: Name, Age, Traits/Universe/Style, Photo,
-// Appearance, Secondary characters) — for creating just the hero's avatar,
-// free and without an account, for a new user not ready to commit to a book.
+// the story prompt and secondary characters (steps here: Name, Age,
+// Traits/Universe/Style, Photo, Appearance) — for creating just the hero's
+// own portrait, free and without an account. Secondary characters are
+// skipped: they're companions for a story, meaningless for a solo profile
+// picture.
 export function CreateAvatarWizard() {
   const { t } = useLanguage();
   const { draft, submitAvatar } = useBookDraft();
@@ -60,14 +61,13 @@ export function CreateAvatarWizard() {
   };
 
   // Maps onto the full wizard's step titles (Prénom, Âge, Traits, Photo,
-  // Apparence, Personnages secondaires), skipping the story-context one.
+  // Apparence), skipping the story-context and secondary-characters ones.
   const stepShortTitles = [
     t.wizard.stepShortTitles[0],
     t.wizard.stepShortTitles[1],
     t.wizard.stepShortTitles[2],
     t.wizard.stepShortTitles[4],
     t.wizard.stepShortTitles[5],
-    t.wizard.stepShortTitles[6],
   ];
 
   return (
@@ -82,7 +82,6 @@ export function CreateAvatarWizard() {
           {step === 3 && <StepTraits />}
           {step === 4 && <StepPhoto />}
           {step === 5 && <StepAppearance />}
-          {step === 6 && <StepSecondaryCharacters heroName={draft.name} />}
         </div>
       </div>
 
