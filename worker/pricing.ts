@@ -3,6 +3,6 @@
 // deliberate simplification. Amounts in cents. Shared between checkout.ts
 // (creating the charge) and me-books.ts (displaying order history).
 export const PRICES_CENTS: Record<string, number> = {
-  print: 2490,
+  print: 2990,
   digital: 1290,
 };

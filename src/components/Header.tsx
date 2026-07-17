@@ -100,7 +100,9 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
           <Link to="/exemples" style={{ color: 'inherit' }}>
             {t.nav.examples}
           </Link>
-          <span>{t.nav.pricing}</span>
+          <Link to="/tarifs" style={{ color: 'inherit' }}>
+            {t.nav.pricing}
+          </Link>
         </nav>
       )}
 
@@ -191,7 +193,13 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
             >
               {t.nav.examples}
             </Link>
-            <span style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0' }}>{t.nav.pricing}</span>
+            <Link
+              to="/tarifs"
+              onClick={() => setDrawerOpen(false)}
+              style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0', textDecoration: 'none' }}
+            >
+              {t.nav.pricing}
+            </Link>
           </div>
         </div>
       )}

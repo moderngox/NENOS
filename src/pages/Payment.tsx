@@ -15,7 +15,14 @@ export function Payment() {
   const { t, lang } = useLanguage();
   const { draft, story, preview } = useBookDraft();
   const { user } = useAuth();
-  const [format, setFormat] = useState<'print' | 'digital'>('print');
+  // Carries the plan picked on the pricing page (/tarifs) through the
+  // wizard, which doesn't otherwise thread a format preference — read once
+  // and cleared so a later, unrelated visit here doesn't inherit it.
+  const [format, setFormat] = useState<'print' | 'digital'>(() => {
+    const preferred = sessionStorage.getItem('nenos_preferred_format');
+    sessionStorage.removeItem('nenos_preferred_format');
+    return preferred === 'digital' ? 'digital' : 'print';
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +55,7 @@ export function Payment() {
   const universeLabel = UNIVERSE_LABELS[draft.universe]?.[lang] ?? UNIVERSE_LABELS.space[lang];
   const cover = preview.assets?.coverFrontUrl ?? null;
 
-  const prices = { print: lang === 'fr' ? '24,90€' : '$24.90', digital: lang === 'fr' ? '12,90€' : '$12.90' };
+  const prices = { print: lang === 'fr' ? '29,90€' : '$29.90', digital: lang === 'fr' ? '12,90€' : '$12.90' };
   const total = prices[format];
 
   return (

@@ -3,6 +3,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { BookDraftProvider } from './context/BookDraftContext';
 import { AuthProvider } from './context/AuthContext';
 import { Landing } from './pages/Landing';
+import { Pricing } from './pages/Pricing';
 import { HowItWorks } from './pages/HowItWorks';
 import { CreateWizard } from './pages/create/CreateWizard';
 import { CreateAvatarWizard } from './pages/create/CreateAvatarWizard';
@@ -26,6 +27,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/comment-ca-marche" element={<HowItWorks />} />
+              <Route path="/tarifs" element={<Pricing />} />
               <Route path="/creer" element={<Navigate to="/creer/1" replace />} />
               <Route path="/creer/:step" element={<CreateWizard />} />
               <Route path="/creer-avatar" element={<Navigate to="/creer-avatar/1" replace />} />

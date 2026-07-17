@@ -42,7 +42,7 @@ export function Revelation() {
     );
   }
 
-  const price = lang === 'fr' ? '24,90€' : '$24.90';
+  const price = lang === 'fr' ? '29,90€' : '$29.90';
   const { title, subtitle } = story.frontCover;
   const page1Text = story.pages[0]?.text ?? '';
   const isGenerating = preview.status === 'generating' || preview.status === 'idle';

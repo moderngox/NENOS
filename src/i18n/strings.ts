@@ -127,6 +127,27 @@ export interface Strings {
     waitMessage: string;
     tips: string[];
   };
+  pricing: {
+    title: string;
+    subtitle: string;
+    comingSoonBadge: string;
+    oneTime: string;
+    perMonth: string;
+    digital: { name: string; price: string; description: string; features: string[]; cta: string };
+    hardcover: { name: string; price: string; description: string; features: string[]; cta: string };
+    subscription: {
+      name: string;
+      price: string;
+      description: string;
+      features: string[];
+      badge: string;
+      emailPlaceholder: string;
+      submitCta: string;
+      submitting: string;
+      successMessage: string;
+      errorMessage: string;
+    };
+  };
   auth: {
     loginTitle: string;
     signupTitle: string;
@@ -504,6 +525,44 @@ export const fr: Strings = {
       'Nos illustrateurs IA peaufinent chaque détail : encore un instant !',
     ],
   },
+  pricing: {
+    title: 'Des histoires magiques, à ton rythme',
+    subtitle: 'Choisis la formule qui convient le mieux à ton héros — sans engagement sur les formules à l\'unité.',
+    comingSoonBadge: 'Bientôt disponible',
+    oneTime: 'paiement unique',
+    perMonth: '/mois',
+    digital: {
+      name: 'Numérique',
+      price: '12,90€',
+      description: 'Pour lire et garder son histoire en numérique.',
+      features: ['32 pages illustrées', 'Téléchargement PDF', 'Lecture dans l\'application'],
+      cta: 'Créer mon livre →',
+    },
+    hardcover: {
+      name: 'Relié',
+      price: '29,90€',
+      description: 'L\'histoire complète, en vrai, entre ses mains.',
+      features: ['Livre relié imprimé', '32 pages illustrées', 'Téléchargement PDF inclus', 'Lecture dans l\'application'],
+      cta: 'Créer mon livre →',
+    },
+    subscription: {
+      name: 'Abonnement',
+      price: '19,90€',
+      description: 'Une nouvelle aventure chaque semaine, sans y penser.',
+      features: [
+        '1 livre numérique généré chaque semaine',
+        '1 livre relié à 19,90€ au lieu de 29,90€ chaque mois',
+        'Téléchargement PDF et lecture dans l\'application inclus',
+        'Accès aux cartes interactives',
+      ],
+      badge: 'MEILLEURE OFFRE',
+      emailPlaceholder: 'Ton e-mail',
+      submitCta: 'Être prévenu(e) au lancement →',
+      submitting: 'Envoi...',
+      successMessage: 'Merci ! On te préviendra dès que l\'abonnement sera disponible.',
+      errorMessage: 'Une erreur est survenue. Réessaie.',
+    },
+  },
   auth: {
     loginTitle: 'Connexion',
     signupTitle: 'Créer un compte',
@@ -525,7 +584,7 @@ export const fr: Strings = {
   payment: {
     title: 'Ton livre est prêt à être commandé',
     chooseFormat: 'Choisis ton format',
-    formatPrint: 'Livre imprimé + PDF',
+    formatPrint: 'Livre relié + PDF',
     formatDigital: 'PDF + lecture web seulement',
     summary: 'Récapitulatif',
     delivery: 'Livraison',
@@ -579,7 +638,7 @@ export const fr: Strings = {
     orderStatusPaid: 'Payée',
     orderStatusPending: 'En attente',
     orderStatusFailed: 'Paiement à vérifier',
-    formatPrint: 'Livre imprimé + PDF',
+    formatPrint: 'Livre relié + PDF',
     formatDigital: 'PDF + lecture web',
     noOrders: 'Aucune commande pour le moment.',
     noBooks: 'Aucun livre pour le moment.',
@@ -880,6 +939,44 @@ export const en: Strings = {
       "Our AI illustrators are polishing every detail — almost there!",
     ],
   },
+  pricing: {
+    title: 'Magical stories, at your own pace',
+    subtitle: "Pick the plan that fits your hero best — no commitment on the one-off plans.",
+    comingSoonBadge: 'Coming soon',
+    oneTime: 'one-time payment',
+    perMonth: '/month',
+    digital: {
+      name: 'Digital',
+      price: '$12.90',
+      description: 'To read and keep the story digitally.',
+      features: ['32 illustrated pages', 'PDF download', 'In-app reading'],
+      cta: 'Create my book →',
+    },
+    hardcover: {
+      name: 'Hardcover',
+      price: '$29.90',
+      description: 'The full story, for real, in their hands.',
+      features: ['Printed hardcover book', '32 illustrated pages', 'PDF download included', 'In-app reading'],
+      cta: 'Create my book →',
+    },
+    subscription: {
+      name: 'Subscription',
+      price: '$19.90',
+      description: 'A new adventure every week, without thinking about it.',
+      features: [
+        '1 digital book generated every week',
+        '1 hardcover book for $19.90 instead of $29.90 every month',
+        'PDF download and in-app reading included',
+        'Access to interactive maps',
+      ],
+      badge: 'BEST VALUE',
+      emailPlaceholder: 'Your email',
+      submitCta: 'Notify me at launch →',
+      submitting: 'Sending...',
+      successMessage: "Thanks! We'll let you know as soon as the subscription is available.",
+      errorMessage: 'Something went wrong. Try again.',
+    },
+  },
   auth: {
     loginTitle: 'Log in',
     signupTitle: 'Create an account',
@@ -901,7 +998,7 @@ export const en: Strings = {
   payment: {
     title: 'Your book is ready to order',
     chooseFormat: 'Choose your format',
-    formatPrint: 'Printed book + PDF',
+    formatPrint: 'Hardcover book + PDF',
     formatDigital: 'PDF + web reading only',
     summary: 'Summary',
     delivery: 'Shipping',
@@ -955,7 +1052,7 @@ export const en: Strings = {
     orderStatusPaid: 'Paid',
     orderStatusPending: 'Pending',
     orderStatusFailed: 'Payment needs review',
-    formatPrint: 'Printed book + PDF',
+    formatPrint: 'Hardcover book + PDF',
     formatDigital: 'PDF + web reading',
     noOrders: 'No orders yet.',
     noBooks: 'No books yet.',
