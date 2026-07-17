@@ -14,9 +14,12 @@ export async function handleGetMyBooks(request: Request, env: Env): Promise<Resp
   if (!user) return jsonResponse({ error: "Not signed in." }, 401);
 
   const books = await getBooksForUser(env.DB, user.id);
+  // Free avatar-only creations (see worker/routes/avatar.ts) aren't real
+  // orders — they only feed the profile card, not this order/library list.
+  const realBooks = books.filter((book) => book.kind !== "avatar");
 
   return jsonResponse({
-    books: books.map((book) => ({
+    books: realBooks.map((book) => ({
       bookId: book.id,
       title: book.story?.frontCover.title ?? book.draft.name,
       coverUrl: book.fullStatus === "ready" ? `/api/books/${book.id}/full-assets/cover-front.png` : book.previewAssets ? `/api/books/${book.id}/assets/${book.previewAssets.coverFront}` : null,
@@ -27,7 +30,7 @@ export async function handleGetMyBooks(request: Request, env: Env): Promise<Resp
       createdAt: book.createdAt,
       fullStatus: book.fullStatus,
       fullUnitsDone: book.fullUnitsDone,
-      fullUnitsTotal: (book.story?.pages.length ?? 10) + 3,
+      fullUnitsTotal: (book.story?.pages.length ?? 10) + 4,
       pdfReady: book.pdfStatus === "ready",
     })),
   });

@@ -1,7 +1,7 @@
 import { getBook, updateFullProgress } from "../db";
 import { isPaymentUnlocked } from "../auth";
 import { generateImage } from "../image-client";
-import { buildBackCoverPrompt, buildCharacterSheetPrompt, buildFrontCoverPrompt, buildPagePrompt } from "../image-style-bible";
+import { buildBackCoverPrompt, buildCharacterSheetPrompt, buildFrontCoverPrompt, buildPagePrompt, buildPortraitPrompt } from "../image-style-bible";
 import { normalizeUniverseForImagePipeline } from "../story-beats";
 import { loadSecondaryCharacterPhotos, mimeForKey, traitsSummary } from "./preview";
 
@@ -29,6 +29,7 @@ const STALE_LOCK_MS = 10 * 60 * 1000;
 
 type Unit =
   | { kind: "character-sheet"; filename: string }
+  | { kind: "portrait"; filename: string }
   | { kind: "cover-front"; filename: string }
   | { kind: "page"; filename: string; pageIndex: number }
   | { kind: "cover-back"; filename: string };
@@ -36,6 +37,11 @@ type Unit =
 function buildPlan(pageCount: number): Unit[] {
   const plan: Unit[] = [
     { kind: "character-sheet", filename: "character-sheet.png" },
+    // A dedicated close-up portrait for the account profile avatar — the
+    // character sheet is a full-body 3-view turnaround and the cover is a
+    // full scene, neither crops well into a circle (see image-style-bible's
+    // buildPortraitPrompt for why this needed its own generation).
+    { kind: "portrait", filename: "portrait.png" },
     { kind: "cover-front", filename: "cover-front.png" },
   ];
   for (let i = 0; i < pageCount; i++) {
@@ -123,7 +129,16 @@ export async function generateNextUnit(bookId: string, env: Env): Promise<Genera
       const referenceImages = [characterSheetInput, ...secondaryPhotoInputs];
 
       let bytes: ArrayBuffer;
-      if (unit.kind === "cover-front") {
+      if (unit.kind === "portrait") {
+        bytes = await generateImage({
+          apiKey: env.OPENAI_API_KEY,
+          prompt: buildPortraitPrompt({ style: book.draft.style }),
+          images: referenceImages,
+          size: CHARACTER_SIZE,
+          quality: FULL_QUALITY,
+          timeoutMs: FULL_TIMEOUT_MS,
+        });
+      } else if (unit.kind === "cover-front") {
         bytes = await generateImage({
           apiKey: env.OPENAI_API_KEY,
           prompt: buildFrontCoverPrompt({ universe, style: book.draft.style, secondaryCharacters: book.draft.secondaryCharacters, photoRefIndex }),

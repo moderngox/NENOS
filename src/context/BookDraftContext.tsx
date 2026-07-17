@@ -159,6 +159,7 @@ interface BookDraftContextValue {
   reset: () => void;
   story: BookStoryResult | null;
   submit: () => Promise<BookStoryResult>;
+  submitAvatar: () => Promise<{ bookId: string }>;
   preview: PreviewState;
   generatePreview: () => Promise<void>;
 }
@@ -250,6 +251,50 @@ export function BookDraftProvider({ children }: { children: ReactNode }) {
 
         setStory(body);
         return body;
+      },
+      // Free, standalone hero-avatar creation (see worker/routes/avatar.ts)
+      // — same draft fields as a book, minus the story prompt. Doesn't
+      // touch `story`/`preview` state; the avatar's own ready-page tracks
+      // its status independently via the returned bookId.
+      submitAvatar: async () => {
+        const payload = {
+          name: draft.name,
+          age: draft.age,
+          traits: draft.traits,
+          universe: draft.universe,
+          style: draft.style,
+          skinColor: draft.skinColor,
+          hairColor: draft.hairColor,
+          eyeColor: draft.eyeColor,
+          appearanceDetails: draft.appearanceDetails,
+          language: lang,
+          secondaryCharacters: draft.secondaryCharacters.map((c) => ({
+            id: c.id,
+            role: c.role,
+            name: c.name,
+            age: c.age,
+            skinColor: c.skinColor,
+            hairColor: c.hairColor,
+            eyeColor: c.eyeColor,
+            description: c.description,
+          })),
+        };
+
+        const form = new FormData();
+        form.append('draft', JSON.stringify(payload));
+        if (draft.photo) form.append('photo', draft.photo);
+        for (const c of draft.secondaryCharacters) {
+          if (c.photo) form.append(`secondaryPhoto_${c.id}`, c.photo);
+        }
+
+        const response = await fetch('/api/avatars', { method: 'POST', body: form });
+        const body = (await response.json().catch(() => null)) as { bookId?: string; error?: string } | null;
+
+        if (!response.ok || !body?.bookId) {
+          throw new Error(body?.error ?? `Request failed with status ${response.status}`);
+        }
+
+        return { bookId: body.bookId };
       },
       generatePreview: async () => {
         if (!story) throw new Error('No story to preview yet.');

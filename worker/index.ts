@@ -12,6 +12,7 @@ import { handleGetMyBooks } from "./routes/me-books";
 import { handleGetMyProfile } from "./routes/me-profile";
 import { handleGetOrderDetail } from "./routes/order-detail";
 import { handleOAuthStart, handleOAuthCallback } from "./routes/oauth";
+import { handleCreateAvatar, handleGenerateAvatar, handleGetAvatarStatus, handleClaimAvatar } from "./routes/avatar";
 import { handleScheduled } from "./scheduled";
 
 export default {
@@ -25,6 +26,21 @@ export default {
 
     if (url.pathname === "/api/books" && request.method === "POST") {
       return handleCreateBook(request, env);
+    }
+
+    if (url.pathname === "/api/avatars" && request.method === "POST") {
+      return handleCreateAvatar(request, env);
+    }
+
+    // /api/avatars/:id, /api/avatars/:id/generate, /api/avatars/:id/claim
+    if (parts.length === 3 && parts[0] === "api" && parts[1] === "avatars" && request.method === "GET") {
+      return handleGetAvatarStatus(parts[2], env);
+    }
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "avatars" && parts[3] === "generate" && request.method === "POST") {
+      return handleGenerateAvatar(parts[2], env);
+    }
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "avatars" && parts[3] === "claim" && request.method === "POST") {
+      return handleClaimAvatar(parts[2], request, env);
     }
 
     if (url.pathname === "/api/webhooks/stripe" && request.method === "POST") {

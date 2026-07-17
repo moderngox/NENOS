@@ -75,6 +75,12 @@ export interface StoredBook {
   userId: string | null;
   stripePaymentIntentId: string | null;
   format: string | null;
+  // 'book' — a real (potentially purchasable) storybook, the default.
+  // 'avatar' — a free, standalone hero-avatar creation (name/age/traits/
+  // photo/appearance/secondary characters only, no story, never paid);
+  // see worker/routes/avatar.ts.
+  kind: string;
+  avatarStatus: string;
   createdAt: string;
   updatedAt: string;
 }

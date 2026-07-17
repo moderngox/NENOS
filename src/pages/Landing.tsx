@@ -53,13 +53,30 @@ export function Landing() {
           >
             {t.landing.subtitle}
           </p>
-          <Link
-            to="/creer"
-            className="cta"
-            style={{ fontSize: 18, padding: '15px 28px', width: 'auto', display: 'inline-block' }}
-          >
-            {t.landing.cta}
-          </Link>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <Link
+              to="/creer"
+              className="cta"
+              style={{ fontSize: 18, padding: '15px 28px', width: 'auto', display: 'inline-block' }}
+            >
+              {t.landing.cta}
+            </Link>
+            <Link
+              to="/creer-avatar"
+              className="cta-secondary"
+              style={{
+                fontSize: 15,
+                padding: '15px 24px',
+                width: 'auto',
+                display: 'inline-block',
+                background: 'rgba(255,255,255,.1)',
+                borderColor: 'rgba(255,255,255,.35)',
+                color: '#fff',
+              }}
+            >
+              {t.landing.ctaAvatar}
+            </Link>
+          </div>
         </div>
       </div>
 

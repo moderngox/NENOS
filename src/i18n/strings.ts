@@ -17,6 +17,7 @@ export interface Strings {
     headline: string;
     subtitle: string;
     cta: string;
+    ctaAvatar: string;
     exampleTitle: string;
     exampleQuote: string;
     badgeIllustrated: string;
@@ -220,6 +221,20 @@ export interface Strings {
     emptyTitle: string;
     emptyMessage: string;
     emptyCta: string;
+    emptyCtaAvatar: string;
+  };
+  avatarWizard: {
+    cta: string;
+    generating: string;
+    submitError: string;
+  };
+  avatarReady: {
+    title: string;
+    generatingMessage: (name: string) => string;
+    readyTitle: (name: string) => string;
+    readyMessage: string;
+    viewProfileCta: string;
+    errorMessage: string;
   };
   orderDetail: {
     back: string;
@@ -257,6 +272,7 @@ export const fr: Strings = {
     subtitle:
       'Un livre illustré personnalisé, créé en quelques minutes avec le prénom, le visage et les traits de caractère de votre enfant.',
     cta: 'Créer le livre →',
+    ctaAvatar: 'Créer l’avatar de mon enfant →',
     exampleTitle: 'Un exemple de livre',
     exampleQuote: '"Léa, 6 ans, terrassée de joie de se voir en héroïne !"',
     badgeIllustrated: 'Illustré',
@@ -566,8 +582,22 @@ export const fr: Strings = {
     mapsDescription: 'Débloquez bientôt un jeu vidéo dans l’application, inspiré des univers et des livres de votre héros.',
     mapsBadge: 'Bientôt disponible',
     emptyTitle: 'Ton héros t’attend !',
-    emptyMessage: 'Crée ton premier livre pour faire apparaître son profil ici : avatar, univers préférés, traits de caractère et plus encore.',
-    emptyCta: 'Créer mon premier livre →',
+    emptyMessage: 'Crée l’avatar de ton héros ou un livre complet pour faire apparaître son profil ici : avatar, univers préférés, traits de caractère et plus encore.',
+    emptyCta: 'Créer un livre →',
+    emptyCtaAvatar: 'Créer l’avatar de mon héros →',
+  },
+  avatarWizard: {
+    cta: 'Créer l’avatar →',
+    generating: 'Création de l’avatar...',
+    submitError: 'Une erreur est survenue. Réessaie.',
+  },
+  avatarReady: {
+    title: 'Ton héros prend vie ! ✨',
+    generatingMessage: (name) => `On dessine ${name}...`,
+    readyTitle: (name) => `Voici ${name} !`,
+    readyMessage: 'Connecte-toi pour enregistrer son profil et le retrouver dans ton espace.',
+    viewProfileCta: 'Voir mon profil →',
+    errorMessage: 'La création de l’avatar a échoué. Réessaie.',
   },
   orderDetail: {
     back: '← Retour à mes commandes',
@@ -605,6 +635,7 @@ export const en: Strings = {
     subtitle:
       'A personalized illustrated book, created in minutes with your child’s name, face and personality.',
     cta: 'Create the book →',
+    ctaAvatar: 'Create your kid’s avatar →',
     exampleTitle: 'A book example',
     exampleQuote: '"Lea, 6, over the moon to see herself as the hero!"',
     badgeIllustrated: 'Illustrated',
@@ -913,8 +944,22 @@ export const en: Strings = {
     mapsDescription: 'Coming soon: unlock an in-app video game inspired by your hero’s favorite universes and books.',
     mapsBadge: 'Coming soon',
     emptyTitle: 'Your hero is waiting!',
-    emptyMessage: 'Create your first book to bring their profile to life here: avatar, favorite universes, traits and more.',
-    emptyCta: 'Create my first book →',
+    emptyMessage: 'Create your hero’s avatar or a full book to bring their profile to life here: avatar, favorite universes, traits and more.',
+    emptyCta: 'Create a book →',
+    emptyCtaAvatar: 'Create my hero’s avatar →',
+  },
+  avatarWizard: {
+    cta: 'Create avatar →',
+    generating: 'Creating avatar...',
+    submitError: 'Something went wrong. Try again.',
+  },
+  avatarReady: {
+    title: 'Your hero comes to life! ✨',
+    generatingMessage: (name) => `Drawing ${name}...`,
+    readyTitle: (name) => `Meet ${name}!`,
+    readyMessage: 'Sign in to save their profile and find it in your account.',
+    viewProfileCta: 'View my profile →',
+    errorMessage: 'Avatar creation failed. Try again.',
   },
   orderDetail: {
     back: '← Back to my orders',

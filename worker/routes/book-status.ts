@@ -35,7 +35,7 @@ export async function handleGetBookStatus(bookId: string, env: Env): Promise<Res
     story: book.story,
     fullStatus: book.fullStatus,
     fullUnitsDone: book.fullUnitsDone,
-    fullUnitsTotal: pageCount + 3, // character-sheet + cover-front + pages + cover-back
+    fullUnitsTotal: pageCount + 4, // character-sheet + portrait + cover-front + pages + cover-back
     fullAssets,
     pdfReady: book.pdfStatus === "ready",
   });

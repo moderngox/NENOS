@@ -63,9 +63,25 @@ export function KidProfileCard() {
         <p style={{ font: '600 14px/1.6 Geist', color: 'rgba(255,255,255,.75)', maxWidth: 420, margin: '0 auto 20px' }}>
           {t.kidProfile.emptyMessage}
         </p>
-        <Link to="/creer" className="cta" style={{ display: 'inline-block', width: 'auto', padding: '13px 26px' }}>
-          {t.kidProfile.emptyCta}
-        </Link>
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link to="/creer-avatar" className="cta" style={{ display: 'inline-block', width: 'auto', padding: '13px 24px' }}>
+            {t.kidProfile.emptyCtaAvatar}
+          </Link>
+          <Link
+            to="/creer"
+            className="cta-secondary"
+            style={{
+              display: 'inline-block',
+              width: 'auto',
+              padding: '13px 24px',
+              background: 'rgba(255,255,255,.1)',
+              borderColor: 'rgba(255,255,255,.35)',
+              color: '#fff',
+            }}
+          >
+            {t.kidProfile.emptyCta}
+          </Link>
+        </div>
       </div>
     );
   }

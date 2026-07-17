@@ -98,6 +98,21 @@ ${styleCore(style)}
 ${NEGATIVE_QUALITY}`;
 }
 
+// A dedicated close-up portrait, used as the account/profile avatar —
+// distinct from the character sheet (a full-body 3-view turnaround, no
+// single clean face-forward crop) and the front cover (a full scene, not a
+// close shot). Composed specifically to look good cropped into a circle.
+export function buildPortraitPrompt(params: { style?: string }): string {
+  const { style = "pixar" } = params;
+  return `Generate a single close-up bust portrait of the main child protagonist, using the attached character reference sheet (image #1) as the exact identity, proportions, hairstyle and outfit — do not redesign the character in any way. Head-and-shoulders framing, facing camera or a gentle three-quarter angle, warm confident expression, centered in frame with even margins on all sides. Plain neutral softly-lit studio background (no environment, no props, no other characters) so the portrait reads cleanly when cropped into a circle.
+
+${styleCharacterRules(style)}
+
+${styleCore(style)}
+
+${NEGATIVE_QUALITY}`;
+}
+
 export function buildPagePrompt(params: {
   sceneDescription: string;
   universe: string;

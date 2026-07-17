@@ -4,7 +4,8 @@ export async function insertDraftBook(
   db: D1Database,
   bookId: string,
   draft: BookDraftInput,
-  photoKey: string | null
+  photoKey: string | null,
+  kind: string = "book"
 ): Promise<void> {
   const now = new Date().toISOString();
   await db
@@ -12,8 +13,8 @@ export async function insertDraftBook(
       `INSERT INTO books (
         id, name, age, traits, universe, style, story_prompt,
         appearance_details, skin_color, hair_color, eye_color, secondary_characters,
-        language, photo_key, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        language, photo_key, status, kind, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       bookId,
@@ -31,6 +32,7 @@ export async function insertDraftBook(
       draft.language,
       photoKey,
       "draft",
+      kind,
       now,
       now
     )
@@ -83,6 +85,8 @@ interface BookRow {
   user_id: string | null;
   stripe_payment_intent_id: string | null;
   format: string | null;
+  kind: string;
+  avatar_status: string;
   created_at: string;
   updated_at: string;
 }
@@ -124,6 +128,8 @@ function mapRowToStoredBook(row: BookRow): StoredBook {
     userId: row.user_id,
     stripePaymentIntentId: row.stripe_payment_intent_id,
     format: row.format,
+    kind: row.kind,
+    avatarStatus: row.avatar_status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -211,6 +217,11 @@ export async function updateFullProgress(
     .prepare(`UPDATE books SET full_status = ?, full_units_done = ?, updated_at = ? WHERE id = ?`)
     .bind(status, unitsDone, now, bookId)
     .run();
+}
+
+export async function updateAvatarStatus(db: D1Database, bookId: string, status: string): Promise<void> {
+  const now = new Date().toISOString();
+  await db.prepare(`UPDATE books SET avatar_status = ?, updated_at = ? WHERE id = ?`).bind(status, now, bookId).run();
 }
 
 export async function updatePdfProgress(

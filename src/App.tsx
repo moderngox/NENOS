@@ -5,6 +5,8 @@ import { AuthProvider } from './context/AuthContext';
 import { Landing } from './pages/Landing';
 import { HowItWorks } from './pages/HowItWorks';
 import { CreateWizard } from './pages/create/CreateWizard';
+import { CreateAvatarWizard } from './pages/create/CreateAvatarWizard';
+import { AvatarReady } from './pages/AvatarReady';
 import { Revelation } from './pages/Revelation';
 import { Payment } from './pages/Payment';
 import { OrderConfirmed } from './pages/OrderConfirmed';
@@ -26,6 +28,9 @@ function App() {
               <Route path="/comment-ca-marche" element={<HowItWorks />} />
               <Route path="/creer" element={<Navigate to="/creer/1" replace />} />
               <Route path="/creer/:step" element={<CreateWizard />} />
+              <Route path="/creer-avatar" element={<Navigate to="/creer-avatar/1" replace />} />
+              <Route path="/creer-avatar/:step" element={<CreateAvatarWizard />} />
+              <Route path="/avatar-pret/:bookId" element={<AvatarReady />} />
               <Route path="/revelation" element={<Revelation />} />
               <Route path="/paiement" element={<Payment />} />
               <Route path="/commande-confirmee" element={<OrderConfirmed />} />
