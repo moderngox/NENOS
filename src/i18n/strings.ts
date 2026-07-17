@@ -206,6 +206,21 @@ export interface Strings {
     pdfPreparing: string;
     logout: string;
   };
+  kidProfile: {
+    sectionTitle: string;
+    ageValue: (age: number) => string;
+    pointsLabel: string;
+    booksGeneratedLabel: (count: number) => string;
+    favoriteUniversesTitle: string;
+    featuresTitle: string;
+    secondaryCharactersTitle: string;
+    mapsTitle: string;
+    mapsDescription: string;
+    mapsBadge: string;
+    emptyTitle: string;
+    emptyMessage: string;
+    emptyCta: string;
+  };
   orderDetail: {
     back: string;
     title: string;
@@ -539,6 +554,21 @@ export const fr: Strings = {
     pdfPreparing: 'PDF en préparation…',
     logout: 'Se déconnecter',
   },
+  kidProfile: {
+    sectionTitle: 'Mon héros',
+    ageValue: (age) => `${age} ans`,
+    pointsLabel: 'points de héros',
+    booksGeneratedLabel: (count) => (count > 1 ? `${count} livres créés` : `${count} livre créé`),
+    favoriteUniversesTitle: 'Univers préférés',
+    featuresTitle: 'Ses traits',
+    secondaryCharactersTitle: 'Ses compagnons',
+    mapsTitle: 'Cartes',
+    mapsDescription: 'Débloquez bientôt un jeu vidéo dans l’application, inspiré des univers et des livres de votre héros.',
+    mapsBadge: 'Bientôt disponible',
+    emptyTitle: 'Ton héros t’attend !',
+    emptyMessage: 'Crée ton premier livre pour faire apparaître son profil ici : avatar, univers préférés, traits de caractère et plus encore.',
+    emptyCta: 'Créer mon premier livre →',
+  },
   orderDetail: {
     back: '← Retour à mes commandes',
     title: 'Détails de la commande',
@@ -870,6 +900,21 @@ export const en: Strings = {
     preparing: (done, total) => `Preparing — ${done}/${total}`,
     pdfPreparing: 'Preparing PDF…',
     logout: 'Log out',
+  },
+  kidProfile: {
+    sectionTitle: 'My hero',
+    ageValue: (age) => `${age} years old`,
+    pointsLabel: 'hero points',
+    booksGeneratedLabel: (count) => `${count} ${count > 1 ? 'books' : 'book'} created`,
+    favoriteUniversesTitle: 'Favorite universes',
+    featuresTitle: 'Their traits',
+    secondaryCharactersTitle: 'Their companions',
+    mapsTitle: 'Maps',
+    mapsDescription: 'Coming soon: unlock an in-app video game inspired by your hero’s favorite universes and books.',
+    mapsBadge: 'Coming soon',
+    emptyTitle: 'Your hero is waiting!',
+    emptyMessage: 'Create your first book to bring their profile to life here: avatar, favorite universes, traits and more.',
+    emptyCta: 'Create my first book →',
   },
   orderDetail: {
     back: '← Back to my orders',

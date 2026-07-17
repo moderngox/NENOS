@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { BackButton } from '../components/BackButton';
+import { KidProfileCard } from '../components/KidProfileCard';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -98,6 +99,8 @@ export function Account() {
             {t.account.logout}
           </button>
         </div>
+
+        <KidProfileCard />
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, borderBottom: '1px solid var(--border)' }}>
           {(['orders', 'books'] as const).map((id) => (

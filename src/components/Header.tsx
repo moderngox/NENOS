@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logoMark from '../assets/logo-mark.png';
+import unknownAvatar from '../assets/unknownAvatar.svg';
 import { LanguageToggle } from './LanguageToggle';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -39,7 +40,8 @@ interface HeaderProps {
 
 export function Header({ variant = 'light', showNav = false, activeNav, cta }: HeaderProps) {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const avatarSrc = user ? profile?.avatarUrl || unknownAvatar : null;
   const dark = variant === 'dark';
   const [drawerOpen, setDrawerOpen] = useState(false);
   const showMarketingNav = showNav && !activeNav;
@@ -121,7 +123,21 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
           title={t.nav.account}
           style={{ display: 'flex', color: activeNav === 'account' ? 'var(--cyan)' : dark ? 'var(--cream)' : 'var(--ink)' }}
         >
-          <AccountIcon />
+          {avatarSrc ? (
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                backgroundImage: `url(${avatarSrc})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                border: activeNav === 'account' ? '2px solid var(--cyan)' : '1.5px solid rgba(0,0,0,.08)',
+              }}
+            />
+          ) : (
+            <AccountIcon />
+          )}
         </Link>
         {cta && (
           <Link to={cta.to} className="cta desktop-only" style={{ fontSize: 14, padding: '10px 20px', width: 'auto' }}>
