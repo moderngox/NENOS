@@ -326,7 +326,7 @@ export const fr: Strings = {
       {
         title: 'Reçois ton livre',
         description:
-          'La génération complète prend jusqu’à 30 minutes. Tu reçois un e-mail dès qu’il est prêt — c’est à ce moment-là seulement que ta carte est débitée.',
+          'La génération complète prend jusqu’à 60 minutes. Tu reçois un e-mail dès qu’il est prêt — c’est à ce moment-là seulement que ta carte est débitée.',
       },
     ],
     disclaimerTitle: 'Et le paiement dans tout ça ?',
@@ -503,7 +503,7 @@ export const fr: Strings = {
     previewBadge: 'APERÇU',
     pagesCaption: '24 pages illustrées · PDF + version imprimée en option',
     unlockCta: (price) => `Débloquer le livre complet — ${price}`,
-    disclaimer: 'Après commande, la préparation complète prend jusqu\'à 30 minutes — tu seras prévenu(e) par e-mail dès que ton livre sera prêt.',
+    disclaimer: 'Après commande, la préparation complète prend jusqu\'à 60 minutes — tu seras prévenu(e) par e-mail dès que ton livre sera prêt.',
     generatingTitle: 'Ton histoire prend vie...',
     generatingSteps: ['Création de la fiche de personnage', 'Composition de la couverture du livre', 'Illustration de la première page'],
   },
@@ -737,7 +737,7 @@ export const en: Strings = {
       {
         title: 'Receive your book',
         description:
-          'Full generation takes up to 30 minutes. You get an email as soon as it’s ready — that’s the moment your card is actually charged.',
+          'Full generation takes up to 60 minutes. You get an email as soon as it’s ready — that’s the moment your card is actually charged.',
       },
     ],
     disclaimerTitle: 'What about payment?',
@@ -913,7 +913,7 @@ export const en: Strings = {
     previewBadge: 'PREVIEW',
     pagesCaption: '24 illustrated pages · PDF + optional printed copy',
     unlockCta: (price) => `Unlock the full storybook — ${price}`,
-    disclaimer: "After ordering, full preparation takes up to 30 minutes — you'll get an email as soon as your book is ready.",
+    disclaimer: "After ordering, full preparation takes up to 60 minutes — you'll get an email as soon as your book is ready.",
     generatingTitle: 'Your story is coming to life...',
     generatingSteps: ['Creating the character sheet', 'Composing the book cover', 'Illustrating the first page'],
   },
