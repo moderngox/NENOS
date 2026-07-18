@@ -1,5 +1,25 @@
 import type { BookDraftInput, PreviewAssets, StoredBook, StoryBeatsResult } from "./types";
 
+// Low-traffic D1 databases occasionally hit a transient
+// "D1_ERROR: D1 DB storage operation exceeded timeout which caused object
+// to be reset" on the first write after a period of inactivity — the
+// underlying storage object waking back up, not a real failure. A bare
+// retry has reliably succeeded immediately every time this has been seen in
+// practice, so this wraps the write instead of surfacing a scary error to
+// whoever happens to make the first request in a while.
+async function withD1Retry<T>(fn: () => Promise<T>, attempts = 3, delayMs = 400): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (attempt < attempts - 1) await new Promise((resolve) => setTimeout(resolve, delayMs * (attempt + 1)));
+    }
+  }
+  throw lastErr;
+}
+
 export async function insertDraftBook(
   db: D1Database,
   bookId: string,
@@ -8,35 +28,47 @@ export async function insertDraftBook(
   kind: string = "book"
 ): Promise<void> {
   const now = new Date().toISOString();
-  await db
-    .prepare(
-      `INSERT INTO books (
-        id, name, age, traits, universe, style, story_prompt,
-        appearance_details, skin_color, hair_color, eye_color, secondary_characters,
-        language, photo_key, status, kind, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    )
-    .bind(
-      bookId,
-      draft.name,
-      draft.age,
-      JSON.stringify(draft.traits),
-      draft.universe,
-      draft.style,
-      draft.storyPrompt,
-      draft.appearanceDetails,
-      draft.skinColor,
-      draft.hairColor,
-      draft.eyeColor,
-      JSON.stringify(draft.secondaryCharacters),
-      draft.language,
-      photoKey,
-      "draft",
-      kind,
-      now,
-      now
-    )
-    .run();
+  try {
+    await withD1Retry(() =>
+      db
+        .prepare(
+          `INSERT INTO books (
+            id, name, age, traits, universe, style, story_prompt,
+            appearance_details, skin_color, hair_color, eye_color, secondary_characters,
+            language, photo_key, status, kind, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .bind(
+          bookId,
+          draft.name,
+          draft.age,
+          JSON.stringify(draft.traits),
+          draft.universe,
+          draft.style,
+          draft.storyPrompt,
+          draft.appearanceDetails,
+          draft.skinColor,
+          draft.hairColor,
+          draft.eyeColor,
+          JSON.stringify(draft.secondaryCharacters),
+          draft.language,
+          photoKey,
+          "draft",
+          kind,
+          now,
+          now
+        )
+        .run()
+    );
+  } catch (err) {
+    // Confirmed in production: the "object reset" timeout can be reported
+    // back to the caller *after* the write actually landed. A retry then
+    // collides on this fresh bookId's primary key — that collision means
+    // the draft already exists, i.e. the outcome we wanted, not a new
+    // failure.
+    if ((err as Error).message?.includes("UNIQUE constraint failed")) return;
+    throw err;
+  }
 }
 
 export async function updateBookBeats(db: D1Database, bookId: string, beats: StoryBeatsResult): Promise<void> {
