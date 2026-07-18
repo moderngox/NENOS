@@ -80,6 +80,9 @@ export async function encodeRawToJpeg(rawBytes: ArrayBuffer, quality = 82): Prom
   const width = view.getUint32(0, true);
   const height = view.getUint32(4, true);
   const data = new Uint8ClampedArray(rawBytes, 8);
-  const imageData = new ImageData(data, width, height);
-  return encodeJpeg(imageData, { quality });
+  // Plain object matching the same minimal {data/width/height} shape the
+  // codecs read (see the WorkersImageData note above) — avoids referencing
+  // the global `ImageData` constructor, which isn't in scope under the
+  // worker's own tsconfig (no DOM lib).
+  return encodeJpeg({ data, width, height }, { quality });
 }

@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { BackButton } from '../components/BackButton';
 import { useLanguage } from '../context/LanguageContext';
-import { exampleBooks } from '../data/exampleBooks';
+import { getExampleBooks } from '../data/exampleBooks';
 
 export function Examples() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const exampleBooks = getExampleBooks(lang);
 
   return (
     <div className="screen">
@@ -48,26 +49,30 @@ export function Examples() {
 
               <div style={{ flex: '1 1 220px', minWidth: 180 }}>
                 <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 16, color: 'var(--ink)', marginBottom: 4 }}>
-                  {t.examplesPage.bookTitle}
+                  {book.title}
                 </div>
-                <div style={{ font: '600 12px Geist', color: 'var(--muted)' }}>{t.examplesPage.bookSubtitle}</div>
+                <div style={{ font: '600 12px Geist', color: 'var(--muted)' }}>{book.subtitle}</div>
               </div>
 
               <div style={{ flex: '1 1 140px', minWidth: 120 }}>
                 <div style={{ font: '700 10px Geist', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 2 }}>
                   {t.examplesPage.styleLabel}
                 </div>
-                <div style={{ font: '600 13px Geist', color: 'var(--ink)' }}>{t.examplesPage.bookStyle}</div>
+                <div style={{ font: '600 13px Geist', color: 'var(--ink)' }}>{book.styleLabel}</div>
               </div>
 
               <div style={{ flex: '1 1 140px', minWidth: 120 }}>
                 <div style={{ font: '700 10px Geist', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 2 }}>
                   {t.examplesPage.universeLabel}
                 </div>
-                <div style={{ font: '600 13px Geist', color: 'var(--ink)' }}>{t.examplesPage.bookUniverse}</div>
+                <div style={{ font: '600 13px Geist', color: 'var(--ink)' }}>{book.universeLabel}</div>
               </div>
 
-              <Link to={`/exemples/${book.slug}`} className="cta" style={{ width: 'auto', padding: '10px 22px', flex: 'none' }}>
+              <Link
+                to={book.bookId ? `/livre/${book.bookId}` : `/exemples/${book.slug}`}
+                className="cta"
+                style={{ width: 'auto', padding: '10px 22px', flex: 'none' }}
+              >
                 {t.examplesPage.readCta}
               </Link>
             </div>

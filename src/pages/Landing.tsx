@@ -1,8 +1,46 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { Header } from '../components/Header';
 import { useLanguage } from '../context/LanguageContext';
 import heroChild from '../assets/hero-child.png';
 import coverFr from '../assets/cover-fr.png';
+
+// Cross-fades the default hero shot with two real customers' hero portraits
+// (shown with their explicit consent) — "Ced" (the founder's own account)
+// and "Yaiza" (a beta tester). Real book/avatar IDs, not static assets, so
+// this breaks if either record is ever deleted from D1/R2.
+const HERO_IMAGES = [
+  heroChild,
+  '/api/books/74dfb5b0-84e1-43d7-b620-8a4703f53db5/assets/portrait.png',
+  '/api/books/2ffca42e-1cc8-4710-b450-94fc21629357/full-assets/portrait.png',
+];
+const HERO_FADE_INTERVAL_MS = 4500;
+
+function HeroFader() {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % HERO_IMAGES.length), HERO_FADE_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <>
+      {HERO_IMAGES.map((src, i) => (
+        <div
+          key={src}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${src})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: i === index ? 1 : 0,
+            transition: 'opacity 1.5s ease',
+          }}
+        />
+      ))}
+    </>
+  );
+}
 
 export function Landing() {
   const { t } = useLanguage();
@@ -17,11 +55,10 @@ export function Landing() {
           minHeight: '70svh',
           display: 'flex',
           alignItems: 'flex-end',
-          backgroundImage: `url(${heroChild})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          overflow: 'hidden',
         }}
       >
+        <HeroFader />
         <div
           style={{
             position: 'absolute',

@@ -5,12 +5,8 @@ export interface Strings {
   examplesPage: {
     title: string;
     intro: string;
-    bookTitle: string;
-    bookSubtitle: string;
     styleLabel: string;
     universeLabel: string;
-    bookStyle: string;
-    bookUniverse: string;
     readCta: string;
   };
   landing: {
@@ -287,13 +283,9 @@ export const fr: Strings = {
   nav: { how: 'Comment ça marche', examples: 'Exemples', pricing: 'Tarifs', myBooks: 'Mes livres', account: 'Compte', back: '← Retour' },
   examplesPage: {
     title: 'Exemples de livres',
-    intro: 'Un aperçu du style Kiddoverse, avec Léa dans sa propre aventure sous les étoiles.',
-    bookTitle: 'Léa et le Dragon des Étoiles',
-    bookSubtitle: 'Une aventure sous les étoiles',
+    intro: 'De vrais livres créés par de vraies familles — feuillette-les pour voir le résultat.',
     styleLabel: 'Style graphique',
     universeLabel: 'Univers',
-    bookStyle: 'Comic à effet demi-ton',
-    bookUniverse: 'Ciel étoilé nocturne',
     readCta: 'Lire →',
   },
   landing: {
@@ -702,13 +694,9 @@ export const en: Strings = {
   nav: { how: 'How it works', examples: 'Examples', pricing: 'Pricing', myBooks: 'My books', account: 'Account', back: '← Back' },
   examplesPage: {
     title: 'Book examples',
-    intro: 'A look at the Kiddoverse style, starring Lea in her own night-sky adventure.',
-    bookTitle: 'Lea and the Dragon of the Stars',
-    bookSubtitle: 'An adventure under the stars',
+    intro: 'Real books made by real families — flip through to see the result.',
     styleLabel: 'Graphic style',
     universeLabel: 'Universe',
-    bookStyle: 'Halftone comic',
-    bookUniverse: 'Starry night sky',
     readCta: 'Read →',
   },
   landing: {

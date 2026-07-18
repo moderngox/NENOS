@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { BackButton } from '../components/BackButton';
 import { useLanguage } from '../context/LanguageContext';
-import { exampleBooks } from '../data/exampleBooks';
+import { getExampleBooks } from '../data/exampleBooks';
 
 const PAGE_COUNT = 10;
 const TOTAL_SLIDES = PAGE_COUNT + 2; // front cover + pages + back cover
@@ -19,14 +19,14 @@ function slideUrl(basePath: string, slide: number): string {
 }
 
 export function ExampleReader() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { slug } = useParams();
-  const book = exampleBooks.find((b) => b.slug === slug);
+  const book = getExampleBooks(lang).find((b) => b.slug === slug && b.basePath);
   const [slide, setSlide] = useState(0);
   const isFront = slide === 0;
   const isBack = slide === TOTAL_SLIDES - 1;
 
-  if (!book) {
+  if (!book || !book.basePath) {
     return (
       <div className="screen">
         <Header variant="light" showNav />
@@ -36,6 +36,7 @@ export function ExampleReader() {
       </div>
     );
   }
+  const basePath = book.basePath;
 
   return (
     <div className="screen">
@@ -44,16 +45,16 @@ export function ExampleReader() {
         <BackButton fallback="/exemples" />
 
         <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 4 }}>
-          {t.examplesPage.bookTitle}
+          {book.title}
         </div>
-        <p style={{ font: '600 13px Geist', color: 'var(--muted)', marginBottom: 20 }}>{t.examplesPage.bookSubtitle}</p>
+        <p style={{ font: '600 13px Geist', color: 'var(--muted)', marginBottom: 20 }}>{book.subtitle}</p>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
           <span style={{ font: '700 13px Geist', color: 'var(--muted)' }}>
             {isFront ? t.reader.frontCoverLabel : isBack ? t.reader.backCoverLabel : t.reader.pageLabel(slide, PAGE_COUNT)}
           </span>
           <a
-            href={`${book.basePath}/lea-et-le-dragon-des-etoiles.pdf`}
+            href={`${basePath}/lea-et-le-dragon-des-etoiles.pdf`}
             className="cta-secondary"
             style={{ width: 'auto', padding: '8px 16px', fontSize: 13 }}
           >
@@ -75,7 +76,7 @@ export function ExampleReader() {
               style={{
                 position: 'absolute',
                 inset: 0,
-                backgroundImage: `url(${slideUrl(book.basePath, slide)})`,
+                backgroundImage: `url(${slideUrl(basePath, slide)})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
