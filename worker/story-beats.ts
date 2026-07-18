@@ -1,6 +1,6 @@
 import type { BookDraftInput, StoryBeatsResult, StoryBeat } from "./types";
 
-const PAGE_COUNT = 10;
+const PAGE_COUNT = 22; // 22 story pages + front/back cover = 24 total.
 const MODEL = "gpt-4o"; // vertical-slice choice; revisit against current OpenAI docs before shipping.
 
 const UNIVERSE_LABELS: Record<string, string> = {

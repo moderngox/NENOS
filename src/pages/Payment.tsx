@@ -94,7 +94,7 @@ export function Payment() {
             <div>
               <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 17, color: 'var(--ink)' }}>{title}</div>
               <div style={{ font: '600 12px Geist', color: 'var(--muted)', marginTop: 6 }}>
-                32 {lang === 'fr' ? 'pages' : 'pages'} · {lang === 'fr' ? 'thème' : 'theme'} {universeLabel} · {lang === 'fr' ? 'héroïne' : 'hero'} : {name}
+                {(story?.pages.length ?? 22) + 2} {lang === 'fr' ? 'pages' : 'pages'} · {lang === 'fr' ? 'thème' : 'theme'} {universeLabel} · {lang === 'fr' ? 'héroïne' : 'hero'} : {name}
               </div>
             </div>
           </div>
