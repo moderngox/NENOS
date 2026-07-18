@@ -27,7 +27,10 @@ function parseDraft(raw: unknown): BookDraftInput {
   if (!raw || typeof raw !== "object") throw new Error('Missing or invalid "draft" field.');
   const d = raw as Record<string, unknown>;
 
-  const missing = ["name", "age", "universe", "storyPrompt"].filter((key) => !d[key]);
+  // storyPrompt is deliberately excluded — the wizard's story-context step
+  // is explicitly skippable ("let the AI imagine the story"), so an empty
+  // value here is expected, not missing input.
+  const missing = ["name", "age", "universe"].filter((key) => !d[key]);
   if (missing.length > 0) throw new Error(`Missing required draft field(s): ${missing.join(", ")}.`);
 
   return {
