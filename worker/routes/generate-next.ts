@@ -6,10 +6,18 @@ import { normalizeUniverseForImagePipeline } from "../story-beats";
 import { loadSecondaryCharacterPhotos, mimeForKey, traitsSummary } from "./preview";
 
 // Paid product: relock a fresh high-quality character sheet and regenerate
-// every asset from it (not just the pages the free preview skipped) so the
-// customer never sees a mix of low- and high-quality art. Stored under a
-// distinct `full/` R2 prefix, separate from the sneak-peek assets.
+// every other asset from it (not just the pages the free preview skipped)
+// so the customer never sees a mix of low- and high-quality art. Stored
+// under a distinct `full/` R2 prefix, separate from the sneak-peek assets.
+//
+// Story pages specifically use PAGE_QUALITY ("medium") rather than
+// FULL_QUALITY — at 22 pages per book, pages are the overwhelming majority
+// of a book's image-generation cost, while the character sheet, portrait,
+// and both covers (a customer's first impression and the profile picture)
+// stay at "high". "Medium" is still a clear step up from the free preview's
+// "low" tier.
 const FULL_QUALITY = "high";
+const PAGE_QUALITY = "medium";
 const CHARACTER_SIZE = "1024x1024";
 const PAGE_SIZE = "1024x1536";
 // High-quality edits with reference images observed taking 170-210s in
@@ -171,7 +179,7 @@ export async function generateNextUnit(bookId: string, env: Env): Promise<Genera
           }),
           images: referenceImages,
           size: PAGE_SIZE,
-          quality: FULL_QUALITY,
+          quality: PAGE_QUALITY,
           timeoutMs: FULL_TIMEOUT_MS,
         });
       }
