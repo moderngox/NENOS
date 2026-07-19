@@ -1,9 +1,9 @@
 // Resend's REST API via plain fetch — no SDK, matching how this app already
-// talks to Stripe/OpenAI directly. Uses the shared onboarding@resend.dev
-// sender by default; that sender can only reliably deliver to the Resend
-// account's own verified address until a custom domain is verified — a real
-// limitation of Resend's test mode, not a bug in this code.
-const FROM_ADDRESS = "Nenos <onboarding@resend.dev>";
+// talks to Stripe/OpenAI directly. moderngox.com is verified in Resend
+// (SPF/DKIM confirmed), so sending from it delivers to any real recipient —
+// unlike the shared onboarding@resend.dev sender this used to default to,
+// which only reliably delivered to the Resend account's own address.
+const FROM_ADDRESS = "Nenos <hello@moderngox.com>";
 
 export async function sendEmail(env: Env, params: { to: string; subject: string; html: string }): Promise<void> {
   if (!env.RESEND_API_KEY) {
