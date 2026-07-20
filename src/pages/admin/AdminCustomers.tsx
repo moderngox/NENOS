@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { formatPriceCents, formatDateTime, customerTypePill, PillBadge, type CustomerType } from './adminUtils';
 
 interface Customer {
@@ -13,11 +13,20 @@ interface Customer {
   lastOrderAt: string | null;
 }
 
+const FILTERS = [
+  { value: '', label: 'All' },
+  { value: 'lead', label: 'Lead' },
+  { value: 'registered', label: 'Registered' },
+  { value: 'customer', label: 'Customer' },
+];
+
 const thStyle: React.CSSProperties = { textAlign: 'left', font: '700 11px Geist', color: 'var(--muted)', padding: '10px 14px', borderBottom: '1px solid var(--border)' };
 const tdStyle: React.CSSProperties = { font: '600 13px Geist', color: 'var(--ink)', padding: '12px 14px', borderBottom: '1px solid var(--border)' };
 
 export function AdminCustomers() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const type = searchParams.get('type') ?? '';
   const [customers, setCustomers] = useState<Customer[] | null>(null);
 
   useEffect(() => {
@@ -29,10 +38,37 @@ export function AdminCustomers() {
     })();
   }, []);
 
+  // All customers/leads are already fetched in one request above (this app
+  // has, at most, low hundreds of them) — filtering here avoids a network
+  // round-trip per tab click, unlike Orders' server-side status filter.
+  const filtered = customers ? (type ? customers.filter((c) => c.type === type) : customers) : null;
+
   return (
     <div>
-      <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 24, color: 'var(--ink)', marginBottom: 24 }}>Customers</div>
-      {customers && (
+      <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 24, color: 'var(--ink)', marginBottom: 20 }}>Customers</div>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        {FILTERS.map((f) => (
+          <button
+            key={f.value}
+            type="button"
+            onClick={() => setSearchParams(f.value ? { type: f.value } : {})}
+            style={{
+              font: type === f.value ? '800 12px Geist' : '600 12px Geist',
+              color: type === f.value ? '#fff' : 'var(--ink)',
+              background: type === f.value ? 'var(--ink)' : '#fff',
+              border: '1px solid var(--border)',
+              borderRadius: 999,
+              padding: '7px 16px',
+              cursor: 'pointer',
+            }}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {filtered && (
         <div style={{ border: '1px solid var(--border)', borderRadius: 12, background: '#fff', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -47,14 +83,14 @@ export function AdminCustomers() {
               </tr>
             </thead>
             <tbody>
-              {customers.length === 0 ? (
+              {filtered.length === 0 ? (
                 <tr>
                   <td style={tdStyle} colSpan={7}>
-                    No customers yet.
+                    No customers match this filter.
                   </td>
                 </tr>
               ) : (
-                customers.map((c) => {
+                filtered.map((c) => {
                   const clickable = c.type !== 'lead';
                   return (
                     <tr
