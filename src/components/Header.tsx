@@ -103,6 +103,11 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
           <Link to="/tarifs" style={{ color: 'inherit' }}>
             {t.nav.pricing}
           </Link>
+          {user?.isAdmin && (
+            <Link to="/admin" style={{ color: 'inherit' }}>
+              Admin
+            </Link>
+          )}
         </nav>
       )}
 
@@ -196,10 +201,19 @@ export function Header({ variant = 'light', showNav = false, activeNav, cta }: H
             <Link
               to="/tarifs"
               onClick={() => setDrawerOpen(false)}
-              style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0', textDecoration: 'none' }}
+              style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0', textDecoration: 'none', borderBottom: user?.isAdmin ? '1px solid var(--border)' : 'none' }}
             >
               {t.nav.pricing}
             </Link>
+            {user?.isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setDrawerOpen(false)}
+                style={{ font: '700 17px Geist', color: 'var(--ink)', padding: '14px 0', textDecoration: 'none' }}
+              >
+                Admin
+              </Link>
+            )}
           </div>
         </div>
       )}
