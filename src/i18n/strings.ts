@@ -51,6 +51,11 @@ export interface Strings {
       placeholder: string;
       charHint: string;
       skip: string;
+      micStart: string;
+      micStop: (secondsLeft: number) => string;
+      micTranscribing: string;
+      micPermissionError: string;
+      micTranscribeError: string;
     };
     step5: {
       title: string;
@@ -382,6 +387,11 @@ export const fr: Strings = {
         'Ex. : une aventure où il/elle sauve un petit dragon qui a peur du noir, avec son doudou lapin comme meilleur ami...',
       charHint: 'caractères',
       skip: 'Passer — laisser l’IA imaginer l’histoire',
+      micStart: '🎤 Dicter mon idée',
+      micStop: (secondsLeft) => `⏺️ Enregistrement... ${secondsLeft}s — appuie pour arrêter`,
+      micTranscribing: 'Écriture de ton histoire...',
+      micPermissionError: 'Impossible d’accéder au micro. Vérifie les autorisations de ton navigateur.',
+      micTranscribeError: 'La transcription a échoué. Réessaie ou écris ton idée.',
     },
     step5: {
       title: 'Une photo pour un avatar tout ressemblant',
@@ -793,6 +803,11 @@ export const en: Strings = {
         'E.g.: an adventure where they save a baby dragon afraid of the dark, with their bunny plush as best friend...',
       charHint: 'characters',
       skip: 'Skip — let the AI imagine the story',
+      micStart: '🎤 Record my idea',
+      micStop: (secondsLeft) => `⏺️ Recording... ${secondsLeft}s — tap to stop`,
+      micTranscribing: 'Writing down your story...',
+      micPermissionError: 'Couldn’t access the microphone. Check your browser’s permissions.',
+      micTranscribeError: 'Transcription failed. Try again, or type your idea instead.',
     },
     step5: {
       title: 'A photo for a more lifelike avatar',

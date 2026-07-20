@@ -14,6 +14,7 @@ import { handleGetOrderDetail } from "./routes/order-detail";
 import { handleOAuthStart, handleOAuthCallback } from "./routes/oauth";
 import { handleCreateAvatar, handleGenerateAvatar, handleGetAvatarStatus, handleClaimAvatar } from "./routes/avatar";
 import { handleSubscriptionInterest } from "./routes/subscription-interest";
+import { handleTranscribe } from "./routes/transcribe";
 import { handleScheduled } from "./scheduled";
 
 export default {
@@ -46,6 +47,10 @@ export default {
 
     if (url.pathname === "/api/subscription-interest" && request.method === "POST") {
       return handleSubscriptionInterest(request, env);
+    }
+
+    if (url.pathname === "/api/transcribe" && request.method === "POST") {
+      return handleTranscribe(request, env);
     }
 
     if (url.pathname === "/api/webhooks/stripe" && request.method === "POST") {
