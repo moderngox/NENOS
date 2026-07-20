@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatPriceCents, formatDateTime } from './adminUtils';
+import { formatPriceCents, formatDateTime, customerTypePill, PillBadge, type CustomerType } from './adminUtils';
 
 interface Customer {
   id: string;
+  type: CustomerType;
   email: string;
   name: string | null;
   createdAt: string;
@@ -36,6 +37,7 @@ export function AdminCustomers() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
+                <th style={thStyle}>Type</th>
                 <th style={thStyle}>Name</th>
                 <th style={thStyle}>Email</th>
                 <th style={thStyle}>Orders</th>
@@ -47,21 +49,31 @@ export function AdminCustomers() {
             <tbody>
               {customers.length === 0 ? (
                 <tr>
-                  <td style={tdStyle} colSpan={6}>
+                  <td style={tdStyle} colSpan={7}>
                     No customers yet.
                   </td>
                 </tr>
               ) : (
-                customers.map((c) => (
-                  <tr key={c.id} onClick={() => navigate(`/admin/customers/${c.id}`)} style={{ cursor: 'pointer' }}>
-                    <td style={tdStyle}>{c.name ?? '—'}</td>
-                    <td style={tdStyle}>{c.email}</td>
-                    <td style={tdStyle}>{c.orderCount}</td>
-                    <td style={tdStyle}>{formatPriceCents(c.lifetimeSpendCents)}</td>
-                    <td style={tdStyle}>{c.lastOrderAt ? formatDateTime(c.lastOrderAt) : '—'}</td>
-                    <td style={tdStyle}>{formatDateTime(c.createdAt)}</td>
-                  </tr>
-                ))
+                customers.map((c) => {
+                  const clickable = c.type !== 'lead';
+                  return (
+                    <tr
+                      key={c.id}
+                      onClick={clickable ? () => navigate(`/admin/customers/${c.id}`) : undefined}
+                      style={{ cursor: clickable ? 'pointer' : 'default' }}
+                    >
+                      <td style={tdStyle}>
+                        <PillBadge pill={customerTypePill(c.type)} />
+                      </td>
+                      <td style={tdStyle}>{c.name ?? '—'}</td>
+                      <td style={tdStyle}>{c.email}</td>
+                      <td style={tdStyle}>{c.orderCount}</td>
+                      <td style={tdStyle}>{formatPriceCents(c.lifetimeSpendCents)}</td>
+                      <td style={tdStyle}>{c.lastOrderAt ? formatDateTime(c.lastOrderAt) : '—'}</td>
+                      <td style={tdStyle}>{formatDateTime(c.createdAt)}</td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

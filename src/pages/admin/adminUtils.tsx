@@ -27,6 +27,14 @@ export function paymentStatusPill(status: string): Pill {
   return { label: 'Unpaid', background: 'var(--gray-bg)', color: 'var(--muted)' };
 }
 
+export type CustomerType = 'lead' | 'registered' | 'customer';
+
+export function customerTypePill(type: CustomerType): Pill {
+  if (type === 'customer') return { label: 'Customer', background: 'var(--success-bg)', color: 'var(--success-text)' };
+  if (type === 'registered') return { label: 'Registered', background: 'var(--gray-bg)', color: 'var(--muted)' };
+  return { label: 'Lead', background: '#eef2ff', color: '#3b4ee0' };
+}
+
 export function generationStatusPill(fullStatus: string, pdfStatus: string): Pill {
   if (fullStatus === 'error' || pdfStatus === 'error') return { label: 'Error', background: '#fde2e2', color: '#b3261e' };
   if (fullStatus === 'ready' && pdfStatus === 'ready') return { label: 'Ready', background: 'var(--success-bg)', color: 'var(--success-text)' };
