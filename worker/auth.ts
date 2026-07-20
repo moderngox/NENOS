@@ -44,6 +44,7 @@ export interface SessionUser {
   id: string;
   email: string;
   name: string | null;
+  isAdmin: boolean;
 }
 
 export async function createSession(db: D1Database, userId: string): Promise<{ token: string; expiresAt: string }> {
@@ -89,17 +90,17 @@ export async function getSessionUser(request: Request, env: Env): Promise<Sessio
   if (!token) return null;
 
   const row = await env.DB.prepare(
-    `SELECT users.id as id, users.email as email, users.name as name, sessions.expires_at as expires_at
+    `SELECT users.id as id, users.email as email, users.name as name, users.is_admin as is_admin, sessions.expires_at as expires_at
      FROM sessions JOIN users ON users.id = sessions.user_id
      WHERE sessions.id = ?`
   )
     .bind(token)
-    .first<{ id: string; email: string; name: string | null; expires_at: string }>();
+    .first<{ id: string; email: string; name: string | null; is_admin: number; expires_at: string }>();
 
   if (!row) return null;
   if (new Date(row.expires_at).getTime() < Date.now()) return null;
 
-  return { id: row.id, email: row.email, name: row.name };
+  return { id: row.id, email: row.email, name: row.name, isAdmin: Boolean(row.is_admin) };
 }
 
 export async function deleteSession(request: Request, env: Env): Promise<void> {

@@ -3,14 +3,15 @@ export interface UserRow {
   email: string;
   name: string | null;
   password_hash: string | null;
+  is_admin: number;
 }
 
 export async function getUserByEmail(db: D1Database, email: string): Promise<UserRow | null> {
-  return db.prepare(`SELECT id, email, name, password_hash FROM users WHERE email = ?`).bind(email).first<UserRow>();
+  return db.prepare(`SELECT id, email, name, password_hash, is_admin FROM users WHERE email = ?`).bind(email).first<UserRow>();
 }
 
 export async function getUserById(db: D1Database, id: string): Promise<UserRow | null> {
-  return db.prepare(`SELECT id, email, name, password_hash FROM users WHERE id = ?`).bind(id).first<UserRow>();
+  return db.prepare(`SELECT id, email, name, password_hash, is_admin FROM users WHERE id = ?`).bind(id).first<UserRow>();
 }
 
 export async function createUser(
@@ -23,13 +24,13 @@ export async function createUser(
     .prepare(`INSERT INTO users (id, email, name, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`)
     .bind(id, params.email, params.name, params.passwordHash, now, now)
     .run();
-  return { id, email: params.email, name: params.name, password_hash: params.passwordHash };
+  return { id, email: params.email, name: params.name, password_hash: params.passwordHash, is_admin: 0 };
 }
 
 export async function findUserByOAuthIdentity(db: D1Database, provider: string, providerUserId: string): Promise<UserRow | null> {
   return db
     .prepare(
-      `SELECT users.id as id, users.email as email, users.name as name, users.password_hash as password_hash
+      `SELECT users.id as id, users.email as email, users.name as name, users.password_hash as password_hash, users.is_admin as is_admin
        FROM oauth_identities JOIN users ON users.id = oauth_identities.user_id
        WHERE oauth_identities.provider = ? AND oauth_identities.provider_user_id = ?`
     )

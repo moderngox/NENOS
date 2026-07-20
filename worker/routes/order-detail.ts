@@ -9,12 +9,12 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-interface CardInfo {
+export interface CardInfo {
   brand: string;
   last4: string;
 }
 
-async function fetchCardInfo(env: Env, paymentIntentId: string): Promise<{ card: CardInfo | null; stripeStatus: string | null }> {
+export async function fetchCardInfo(env: Env, paymentIntentId: string): Promise<{ card: CardInfo | null; stripeStatus: string | null }> {
   try {
     const response = await fetch(
       `https://api.stripe.com/v1/payment_intents/${paymentIntentId}?expand[]=payment_method`,

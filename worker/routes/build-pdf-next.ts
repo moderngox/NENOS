@@ -7,7 +7,7 @@ import { buildBookPdf } from "../pdf";
 // crashed unit shouldn't strand the book at "generating" forever. These
 // units are far cheaper than an image generation call, so a much shorter
 // window is enough.
-const STALE_LOCK_MS = 5 * 60 * 1000;
+export const STALE_LOCK_MS = 5 * 60 * 1000;
 
 type Unit = { kind: "decode" | "encode"; filename: string } | { kind: "assemble" };
 

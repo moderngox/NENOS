@@ -33,7 +33,7 @@ const FULL_TIMEOUT_MS = 280000;
 // book at this status forever, since the cron's own idempotency check would
 // keep confirming "still generating" without ever retrying. Comfortably
 // longer than FULL_TIMEOUT_MS plus overhead.
-const STALE_LOCK_MS = 10 * 60 * 1000;
+export const STALE_LOCK_MS = 10 * 60 * 1000;
 
 type Unit =
   | { kind: "character-sheet"; filename: string }

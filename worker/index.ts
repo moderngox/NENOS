@@ -16,6 +16,13 @@ import { handleCreateAvatar, handleGenerateAvatar, handleGetAvatarStatus, handle
 import { handleSubscriptionInterest } from "./routes/subscription-interest";
 import { handleTranscribe } from "./routes/transcribe";
 import { handleScheduled } from "./scheduled";
+import { handleGetAdminOverview } from "./routes/admin/overview";
+import { handleGetAdminCustomers } from "./routes/admin/customers";
+import { handleGetAdminCustomerDetail } from "./routes/admin/customer-detail";
+import { handleGetAdminOrders } from "./routes/admin/orders";
+import { handleGetAdminOrderDetail } from "./routes/admin/order-detail";
+import { handleGetAdminGenerationHealth } from "./routes/admin/generation-health";
+import { handleRetryGeneration, handleRetryPdf, handleResendReadyEmail } from "./routes/admin/actions";
 
 export default {
   async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
@@ -79,6 +86,33 @@ export default {
     // /api/me/orders/:bookId
     if (parts.length === 4 && parts[0] === "api" && parts[1] === "me" && parts[2] === "orders" && request.method === "GET") {
       return handleGetOrderDetail(parts[3], request, env);
+    }
+
+    if (url.pathname === "/api/admin/overview" && request.method === "GET") {
+      return handleGetAdminOverview(request, env);
+    }
+    if (url.pathname === "/api/admin/customers" && request.method === "GET") {
+      return handleGetAdminCustomers(request, env);
+    }
+    // /api/admin/customers/:userId
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "admin" && parts[2] === "customers" && request.method === "GET") {
+      return handleGetAdminCustomerDetail(parts[3], request, env);
+    }
+    if (url.pathname === "/api/admin/orders" && request.method === "GET") {
+      return handleGetAdminOrders(request, env);
+    }
+    if (url.pathname === "/api/admin/generation-health" && request.method === "GET") {
+      return handleGetAdminGenerationHealth(request, env);
+    }
+    // /api/admin/orders/:bookId
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "admin" && parts[2] === "orders" && request.method === "GET") {
+      return handleGetAdminOrderDetail(parts[3], request, env);
+    }
+    // /api/admin/books/:id/retry-generation | retry-pdf | resend-ready-email
+    if (parts.length === 5 && parts[0] === "api" && parts[1] === "admin" && parts[2] === "books" && request.method === "POST") {
+      if (parts[4] === "retry-generation") return handleRetryGeneration(parts[3], request, env);
+      if (parts[4] === "retry-pdf") return handleRetryPdf(parts[3], request, env);
+      if (parts[4] === "resend-ready-email") return handleResendReadyEmail(parts[3], request, env);
     }
 
     // /api/auth/:provider/start and /api/auth/:provider/callback

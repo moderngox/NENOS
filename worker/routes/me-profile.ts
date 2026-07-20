@@ -24,16 +24,32 @@ function byCreatedAtDesc(a: StoredBook, b: StoredBook): number {
 //   worker/routes/avatar.ts). These never carry payment/points, but still
 //   populate name/age/traits/avatar for a brand-new user who hasn't bought
 //   a book yet, so the blank state doesn't linger unnecessarily.
-export async function handleGetMyProfile(request: Request, env: Env): Promise<Response> {
-  const user = await getSessionUser(request, env);
-  if (!user) return jsonResponse({ error: "Not signed in." }, 401);
+export interface KidProfileResponse {
+  hasBooks: boolean;
+  name: string | null;
+  age: number | null;
+  avatarUrl: string | null;
+  favoriteUniverses: string[];
+  traits: string[];
+  skinColor: string | null;
+  hairColor: string | null;
+  eyeColor: string | null;
+  appearanceDetails: string;
+  points: number;
+  booksGenerated: number;
+  secondaryCharacters: { name: string; role: string }[];
+}
 
-  const books = await getBooksForUser(env.DB, user.id);
+// Pulled out from handleGetMyProfile so worker/routes/admin/customer-detail.ts
+// can build the exact same "kid profile" card for an arbitrary customer
+// (looked up by userId, no session involved) instead of only "me".
+export async function buildKidProfile(db: D1Database, userId: string): Promise<KidProfileResponse> {
+  const books = await getBooksForUser(db, userId);
   const qualifying = books.filter((b) => b.kind === "book" && isPaymentUnlocked(b.paymentStatus));
   const avatarBooks = books.filter((b) => b.kind === "avatar");
 
   if (qualifying.length === 0 && avatarBooks.length === 0) {
-    return jsonResponse({
+    return {
       hasBooks: false,
       name: null,
       age: null,
@@ -47,7 +63,7 @@ export async function handleGetMyProfile(request: Request, env: Env): Promise<Re
       points: 0,
       booksGenerated: 0,
       secondaryCharacters: [],
-    });
+    };
   }
 
   // Whichever record — a paid book or a free avatar creation — was made
@@ -87,7 +103,7 @@ export async function handleGetMyProfile(request: Request, env: Env): Promise<Re
     }
   }
 
-  return jsonResponse({
+  return {
     hasBooks: true,
     name: profileSource.draft.name,
     age: profileSource.draft.age,
@@ -101,5 +117,11 @@ export async function handleGetMyProfile(request: Request, env: Env): Promise<Re
     points: readyBooks.length * POINTS_PER_BOOK,
     booksGenerated: readyBooks.length,
     secondaryCharacters: secondaryCharacters.slice(0, 12),
-  });
+  };
+}
+
+export async function handleGetMyProfile(request: Request, env: Env): Promise<Response> {
+  const user = await getSessionUser(request, env);
+  if (!user) return jsonResponse({ error: "Not signed in." }, 401);
+  return jsonResponse(await buildKidProfile(env.DB, user.id));
 }

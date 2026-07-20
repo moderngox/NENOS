@@ -29,7 +29,7 @@ export async function handleSignup(request: Request, env: Env): Promise<Response
   const { token, expiresAt } = await createSession(env.DB, user.id);
 
   return jsonResponse(
-    { user: { id: user.id, email: user.email, name: user.name } },
+    { user: { id: user.id, email: user.email, name: user.name, isAdmin: Boolean(user.is_admin) } },
     200,
     { "Set-Cookie": sessionCookieHeader(token, expiresAt, isSecureRequest(request)) }
   );
@@ -49,7 +49,7 @@ export async function handleLogin(request: Request, env: Env): Promise<Response>
 
   const { token, expiresAt } = await createSession(env.DB, user.id);
   return jsonResponse(
-    { user: { id: user.id, email: user.email, name: user.name } },
+    { user: { id: user.id, email: user.email, name: user.name, isAdmin: Boolean(user.is_admin) } },
     200,
     { "Set-Cookie": sessionCookieHeader(token, expiresAt, isSecureRequest(request)) }
   );

@@ -17,6 +17,13 @@ import { BookReader } from './pages/BookReader';
 import { Login } from './pages/Login';
 import { Examples } from './pages/Examples';
 import { ExampleReader } from './pages/ExampleReader';
+import { AdminLayout } from './pages/admin/AdminLayout';
+import { AdminOverview } from './pages/admin/AdminOverview';
+import { AdminCustomers } from './pages/admin/AdminCustomers';
+import { AdminCustomerDetail } from './pages/admin/AdminCustomerDetail';
+import { AdminOrders } from './pages/admin/AdminOrders';
+import { AdminOrderDetail } from './pages/admin/AdminOrderDetail';
+import { AdminGenerationHealth } from './pages/admin/AdminGenerationHealth';
 
 function App() {
   return (
@@ -43,6 +50,14 @@ function App() {
               <Route path="/connexion" element={<Login />} />
               <Route path="/exemples" element={<Examples />} />
               <Route path="/exemples/:slug" element={<ExampleReader />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminOverview />} />
+                <Route path="orders" element={<AdminOrders />} />
+                <Route path="orders/:bookId" element={<AdminOrderDetail />} />
+                <Route path="customers" element={<AdminCustomers />} />
+                <Route path="customers/:userId" element={<AdminCustomerDetail />} />
+                <Route path="generation" element={<AdminGenerationHealth />} />
+              </Route>
             </Routes>
           </BrowserRouter>
         </BookDraftProvider>

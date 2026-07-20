@@ -2,7 +2,7 @@ import { getBook, markBookCaptured, markBookCaptureFailed } from "./db";
 import { getUserById } from "./users-db";
 import { generateNextUnit } from "./routes/generate-next";
 import { buildPdfNextUnit } from "./routes/build-pdf-next";
-import { sendEmail, bookReadyEmailHtml } from "./email";
+import { sendEmail, bookReadyEmailHtml, adminBookReadyEmailHtml, ADMIN_EMAIL } from "./email";
 
 // Bounds how much work one cron tick takes on — each unit is a real,
 // billed, 3-4 minute OpenAI call, so this keeps a single scheduled
@@ -32,9 +32,13 @@ async function captureAndNotify(bookId: string, env: Env): Promise<void> {
   } else {
     // The book is already generated (real cost incurred) and stays
     // reachable — this just flags the charge itself needs manual
-    // follow-up, a known gap with no admin UI yet.
+    // follow-up. Surfaced to the admin dashboard's order detail page and
+    // via the admin "book ready" email below (captureSucceeded: false).
     await markBookCaptureFailed(env.DB, bookId);
   }
+
+  const bookTitle = book.story?.frontCover.title ?? book.draft.name;
+  const adminOrderUrl = `${env.APP_BASE_URL}/admin/orders/${bookId}`;
 
   if (!book.userId) return;
   const user = await getUserById(env.DB, book.userId);
@@ -44,8 +48,19 @@ async function captureAndNotify(bookId: string, env: Env): Promise<void> {
     to: user.email,
     subject: "Your book is ready!",
     html: bookReadyEmailHtml({
-      bookTitle: book.story?.frontCover.title ?? book.draft.name,
+      bookTitle,
       readerUrl: `${env.APP_BASE_URL}/livre/${bookId}`,
+    }),
+  });
+
+  await sendEmail(env, {
+    to: ADMIN_EMAIL,
+    subject: captured ? "Book ready" : "Book ready — capture FAILED",
+    html: adminBookReadyEmailHtml({
+      bookTitle,
+      customerEmail: user.email,
+      captureSucceeded: captured,
+      adminOrderUrl,
     }),
   });
 }

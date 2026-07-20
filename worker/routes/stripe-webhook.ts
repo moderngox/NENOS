@@ -1,4 +1,7 @@
-import { markBookAuthorized } from "../db";
+import { getBook, markBookAuthorized } from "../db";
+import { getUserById } from "../users-db";
+import { sendEmail, adminOrderPlacedEmailHtml, ADMIN_EMAIL } from "../email";
+import { PRICES_CENTS } from "../pricing";
 
 // Stripe's v1 signing scheme: header is "t=<timestamp>,v1=<hex>,...",
 // signed payload is "<timestamp>.<raw body>", HMAC-SHA256 with the webhook
@@ -54,7 +57,31 @@ export async function handleStripeWebhook(request: Request, env: Env): Promise<R
     const paymentIntentId = event.data?.object?.payment_intent;
     // The card is authorized (held), not charged yet — see checkout.ts's
     // capture_method: manual and worker/scheduled.ts's capture-on-ready.
-    if (bookId && paymentIntentId) await markBookAuthorized(env.DB, bookId, paymentIntentId);
+    if (bookId && paymentIntentId) {
+      await markBookAuthorized(env.DB, bookId, paymentIntentId);
+      // Best-effort — an email hiccup shouldn't make Stripe think this
+      // webhook failed and retry it (which would just re-run the same
+      // markBookAuthorized, harmlessly, but is still noise to avoid).
+      try {
+        const book = await getBook(env.DB, bookId);
+        const user = book?.userId ? await getUserById(env.DB, book.userId) : null;
+        if (book && user) {
+          await sendEmail(env, {
+            to: ADMIN_EMAIL,
+            subject: "New order placed",
+            html: adminOrderPlacedEmailHtml({
+              bookTitle: book.story?.frontCover.title ?? book.draft.name,
+              customerEmail: user.email,
+              format: book.format,
+              priceCents: book.format ? PRICES_CENTS[book.format] ?? null : null,
+              adminOrderUrl: `${env.APP_BASE_URL}/admin/orders/${bookId}`,
+            }),
+          });
+        }
+      } catch (err) {
+        console.error(`Admin order-placed email failed for book ${bookId}:`, err);
+      }
+    }
   }
 
   return new Response(null, { status: 200 });
