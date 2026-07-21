@@ -20,8 +20,8 @@ const FILTERS = [
   { value: 'customer', label: 'Customer' },
 ];
 
-const thStyle: React.CSSProperties = { textAlign: 'left', font: '700 11px Geist', color: 'var(--muted)', padding: '10px 14px', borderBottom: '1px solid var(--border)' };
-const tdStyle: React.CSSProperties = { font: '600 13px Geist', color: 'var(--ink)', padding: '12px 14px', borderBottom: '1px solid var(--border)' };
+const thStyle: React.CSSProperties = { textAlign: 'left', font: '700 11px Geist', color: 'var(--muted)', padding: '10px 14px', borderBottom: '1px solid var(--border)', whiteSpace: 'nowrap' };
+const tdStyle: React.CSSProperties = { font: '600 13px Geist', color: 'var(--ink)', padding: '12px 14px', borderBottom: '1px solid var(--border)', whiteSpace: 'nowrap' };
 
 export function AdminCustomers() {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ export function AdminCustomers() {
     <div>
       <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 24, color: 'var(--ink)', marginBottom: 20 }}>Customers</div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
         {FILTERS.map((f) => (
           <button
             key={f.value}
@@ -70,49 +70,51 @@ export function AdminCustomers() {
 
       {filtered && (
         <div style={{ border: '1px solid var(--border)', borderRadius: 12, background: '#fff', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>Type</th>
-                <th style={thStyle}>Name</th>
-                <th style={thStyle}>Email</th>
-                <th style={thStyle}>Orders</th>
-                <th style={thStyle}>Lifetime spend</th>
-                <th style={thStyle}>Last order</th>
-                <th style={thStyle}>Joined</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
                 <tr>
-                  <td style={tdStyle} colSpan={7}>
-                    No customers match this filter.
-                  </td>
+                  <th style={thStyle}>Type</th>
+                  <th style={thStyle}>Name</th>
+                  <th style={thStyle}>Email</th>
+                  <th style={thStyle}>Orders</th>
+                  <th style={thStyle}>Lifetime spend</th>
+                  <th style={thStyle}>Last order</th>
+                  <th style={thStyle}>Joined</th>
                 </tr>
-              ) : (
-                filtered.map((c) => {
-                  const clickable = c.type !== 'lead';
-                  return (
-                    <tr
-                      key={c.id}
-                      onClick={clickable ? () => navigate(`/admin/customers/${c.id}`) : undefined}
-                      style={{ cursor: clickable ? 'pointer' : 'default' }}
-                    >
-                      <td style={tdStyle}>
-                        <PillBadge pill={customerTypePill(c.type)} />
-                      </td>
-                      <td style={tdStyle}>{c.name ?? '—'}</td>
-                      <td style={tdStyle}>{c.email}</td>
-                      <td style={tdStyle}>{c.orderCount}</td>
-                      <td style={tdStyle}>{formatPriceCents(c.lifetimeSpendCents)}</td>
-                      <td style={tdStyle}>{c.lastOrderAt ? formatDateTime(c.lastOrderAt) : '—'}</td>
-                      <td style={tdStyle}>{formatDateTime(c.createdAt)}</td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td style={tdStyle} colSpan={7}>
+                      No customers match this filter.
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((c) => {
+                    const clickable = c.type !== 'lead';
+                    return (
+                      <tr
+                        key={c.id}
+                        onClick={clickable ? () => navigate(`/admin/customers/${c.id}`) : undefined}
+                        style={{ cursor: clickable ? 'pointer' : 'default' }}
+                      >
+                        <td style={tdStyle}>
+                          <PillBadge pill={customerTypePill(c.type)} />
+                        </td>
+                        <td style={tdStyle}>{c.name ?? '—'}</td>
+                        <td style={tdStyle}>{c.email}</td>
+                        <td style={tdStyle}>{c.orderCount}</td>
+                        <td style={tdStyle}>{formatPriceCents(c.lifetimeSpendCents)}</td>
+                        <td style={tdStyle}>{c.lastOrderAt ? formatDateTime(c.lastOrderAt) : '—'}</td>
+                        <td style={tdStyle}>{formatDateTime(c.createdAt)}</td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

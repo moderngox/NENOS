@@ -28,8 +28,8 @@ const FILTERS = [
   { value: 'error', label: 'Error' },
 ];
 
-const thStyle: React.CSSProperties = { textAlign: 'left', font: '700 11px Geist', color: 'var(--muted)', padding: '10px 14px', borderBottom: '1px solid var(--border)' };
-const tdStyle: React.CSSProperties = { font: '600 13px Geist', color: 'var(--ink)', padding: '12px 14px', borderBottom: '1px solid var(--border)' };
+const thStyle: React.CSSProperties = { textAlign: 'left', font: '700 11px Geist', color: 'var(--muted)', padding: '10px 14px', borderBottom: '1px solid var(--border)', whiteSpace: 'nowrap' };
+const tdStyle: React.CSSProperties = { font: '600 13px Geist', color: 'var(--ink)', padding: '12px 14px', borderBottom: '1px solid var(--border)', whiteSpace: 'nowrap' };
 
 export function AdminOrders() {
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ export function AdminOrders() {
     <div>
       <div style={{ fontFamily: 'Geist, sans-serif', fontWeight: 800, fontSize: 24, color: 'var(--ink)', marginBottom: 20 }}>Orders</div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
         {FILTERS.map((f) => (
           <button
             key={f.value}
@@ -75,48 +75,46 @@ export function AdminOrders() {
 
       {orders && (
         <div style={{ border: '1px solid var(--border)', borderRadius: 12, background: '#fff', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>Title</th>
-                <th style={thStyle}>Customer</th>
-                <th style={thStyle}>Format</th>
-                <th style={thStyle}>Price</th>
-                <th style={thStyle}>Payment</th>
-                <th style={thStyle}>Generation</th>
-                <th style={thStyle}>Placed</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.length === 0 ? (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
                 <tr>
-                  <td style={tdStyle} colSpan={7}>
-                    No orders match this filter.
-                  </td>
+                  <th style={thStyle}>Title</th>
+                  <th style={thStyle}>Customer</th>
+                  <th style={thStyle}>Format</th>
+                  <th style={thStyle}>Price</th>
+                  <th style={thStyle}>Payment</th>
+                  <th style={thStyle}>Generation</th>
+                  <th style={thStyle}>Placed</th>
                 </tr>
-              ) : (
-                orders.map((o) => (
-                  <tr
-                    key={o.bookId}
-                    onClick={() => navigate(`/admin/orders/${o.bookId}`)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <td style={tdStyle}>{o.title}</td>
-                    <td style={tdStyle}>{o.customerEmail ?? '—'}</td>
-                    <td style={tdStyle}>{o.format ?? '—'}</td>
-                    <td style={tdStyle}>{o.priceCents != null ? formatPriceCents(o.priceCents) : '—'}</td>
-                    <td style={tdStyle}>
-                      <PillBadge pill={paymentStatusPill(o.paymentStatus)} />
+              </thead>
+              <tbody>
+                {orders.length === 0 ? (
+                  <tr>
+                    <td style={tdStyle} colSpan={7}>
+                      No orders match this filter.
                     </td>
-                    <td style={tdStyle}>
-                      <PillBadge pill={generationStatusPill(o.fullStatus, o.pdfStatus)} />
-                    </td>
-                    <td style={tdStyle}>{formatDateTime(o.createdAt)}</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  orders.map((o) => (
+                    <tr key={o.bookId} onClick={() => navigate(`/admin/orders/${o.bookId}`)} style={{ cursor: 'pointer' }}>
+                      <td style={tdStyle}>{o.title}</td>
+                      <td style={tdStyle}>{o.customerEmail ?? '—'}</td>
+                      <td style={tdStyle}>{o.format ?? '—'}</td>
+                      <td style={tdStyle}>{o.priceCents != null ? formatPriceCents(o.priceCents) : '—'}</td>
+                      <td style={tdStyle}>
+                        <PillBadge pill={paymentStatusPill(o.paymentStatus)} />
+                      </td>
+                      <td style={tdStyle}>
+                        <PillBadge pill={generationStatusPill(o.fullStatus, o.pdfStatus)} />
+                      </td>
+                      <td style={tdStyle}>{formatDateTime(o.createdAt)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -16,8 +16,8 @@ interface HealthBook {
   stuck: boolean;
 }
 
-const thStyle: React.CSSProperties = { textAlign: 'left', font: '700 11px Geist', color: 'var(--muted)', padding: '10px 14px', borderBottom: '1px solid var(--border)' };
-const tdStyle: React.CSSProperties = { font: '600 13px Geist', color: 'var(--ink)', padding: '12px 14px', borderBottom: '1px solid var(--border)' };
+const thStyle: React.CSSProperties = { textAlign: 'left', font: '700 11px Geist', color: 'var(--muted)', padding: '10px 14px', borderBottom: '1px solid var(--border)', whiteSpace: 'nowrap' };
+const tdStyle: React.CSSProperties = { font: '600 13px Geist', color: 'var(--ink)', padding: '12px 14px', borderBottom: '1px solid var(--border)', whiteSpace: 'nowrap' };
 
 export function AdminGenerationHealth() {
   const navigate = useNavigate();
@@ -40,50 +40,52 @@ export function AdminGenerationHealth() {
       </div>
       {books && (
         <div style={{ border: '1px solid var(--border)', borderRadius: 12, background: '#fff', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>Title</th>
-                <th style={thStyle}>Kind</th>
-                <th style={thStyle}>Full gen</th>
-                <th style={thStyle}>PDF build</th>
-                <th style={thStyle}>Updated</th>
-                <th style={thStyle}>Stuck?</th>
-              </tr>
-            </thead>
-            <tbody>
-              {books.length === 0 ? (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
                 <tr>
-                  <td style={tdStyle} colSpan={6}>
-                    Nothing generating or errored right now.
-                  </td>
+                  <th style={thStyle}>Title</th>
+                  <th style={thStyle}>Kind</th>
+                  <th style={thStyle}>Full gen</th>
+                  <th style={thStyle}>PDF build</th>
+                  <th style={thStyle}>Updated</th>
+                  <th style={thStyle}>Stuck?</th>
                 </tr>
-              ) : (
-                books.map((b) => (
-                  <tr key={b.bookId} onClick={() => navigate(`/admin/orders/${b.bookId}`)} style={{ cursor: 'pointer' }}>
-                    <td style={tdStyle}>{b.title}</td>
-                    <td style={tdStyle}>{b.kind}</td>
-                    <td style={tdStyle}>
-                      {b.fullStatus} ({b.fullUnitsDone}/{b.fullUnitsTotal})
-                    </td>
-                    <td style={tdStyle}>
-                      {b.pdfStatus} ({b.pdfUnitsDone}/{b.pdfUnitsTotal})
-                    </td>
-                    <td style={tdStyle}>{formatDateTime(b.updatedAt)}</td>
-                    <td style={tdStyle}>
-                      {b.stuck ? (
-                        <span style={{ font: '700 11px Geist', padding: '5px 12px', borderRadius: 999, background: '#fde2e2', color: '#b3261e' }}>
-                          Stuck
-                        </span>
-                      ) : (
-                        '—'
-                      )}
+              </thead>
+              <tbody>
+                {books.length === 0 ? (
+                  <tr>
+                    <td style={tdStyle} colSpan={6}>
+                      Nothing generating or errored right now.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  books.map((b) => (
+                    <tr key={b.bookId} onClick={() => navigate(`/admin/orders/${b.bookId}`)} style={{ cursor: 'pointer' }}>
+                      <td style={tdStyle}>{b.title}</td>
+                      <td style={tdStyle}>{b.kind}</td>
+                      <td style={tdStyle}>
+                        {b.fullStatus} ({b.fullUnitsDone}/{b.fullUnitsTotal})
+                      </td>
+                      <td style={tdStyle}>
+                        {b.pdfStatus} ({b.pdfUnitsDone}/{b.pdfUnitsTotal})
+                      </td>
+                      <td style={tdStyle}>{formatDateTime(b.updatedAt)}</td>
+                      <td style={tdStyle}>
+                        {b.stuck ? (
+                          <span style={{ font: '700 11px Geist', padding: '5px 12px', borderRadius: 999, background: '#fde2e2', color: '#b3261e' }}>
+                            Stuck
+                          </span>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
