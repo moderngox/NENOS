@@ -149,7 +149,13 @@ export async function generateNextUnit(bookId: string, env: Env): Promise<Genera
       } else if (unit.kind === "cover-front") {
         bytes = await generateImage({
           apiKey: env.OPENAI_API_KEY,
-          prompt: buildFrontCoverPrompt({ universe, style: book.draft.style, secondaryCharacters: book.draft.secondaryCharacters, photoRefIndex }),
+          prompt: buildFrontCoverPrompt({
+            universe,
+            style: book.draft.style,
+            secondaryCharacters: book.draft.secondaryCharacters,
+            castSheet: book.story.castSheet,
+            photoRefIndex,
+          }),
           images: referenceImages,
           size: PAGE_SIZE,
           quality: FULL_QUALITY,
@@ -175,6 +181,7 @@ export async function generateNextUnit(bookId: string, env: Env): Promise<Genera
             pageCount: book.story.pages.length,
             style: book.draft.style,
             secondaryCharacters: book.draft.secondaryCharacters,
+            castSheet: book.story.castSheet,
             photoRefIndex,
           }),
           images: referenceImages,

@@ -47,10 +47,34 @@ export interface BackCover {
   synopsis: string;
 }
 
+// Auto-extracted from the child's free-text storyPrompt (and the story
+// GPT-4o itself just wrote), covering anyone/anything beyond the
+// protagonist that a rich story idea names but that never gets registered
+// via the wizard's human/animal-shaped secondaryCharacters step — a
+// companion vehicle, an antagonist, a recurring prop. Without this, such
+// entities get zero visual consistency treatment across the book's pages
+// (see image-style-bible.ts's characterConsistencyBlock, which only ever
+// knew about structured secondaryCharacters until this was added).
+export type CastMemberKind = "companion" | "vehicle" | "antagonist" | "prop" | "other";
+// "remote" = heard/communicated-with only (e.g. a voice on a radio) —
+// must never be drawn as physically present in a scene.
+export type CastMemberPresence = "physical" | "remote";
+
+export interface CastMember {
+  id: string;
+  name: string; // must match how the story's "scene" text refers to them
+  kind: CastMemberKind;
+  visualDescription: string; // fixed, reused verbatim every time they appear — type/material/color/distinguishing features, no pose or action
+  role: string; // one line, relationship to the protagonist
+  presence: CastMemberPresence;
+  isPrimaryVehicle: boolean; // at most one true per book — the protagonist's default ride, if any
+}
+
 export interface StoryBeatsResult {
   pages: StoryBeat[];
   frontCover: FrontCover;
   backCover: BackCover;
+  castSheet: CastMember[];
 }
 
 export interface PreviewAssets {

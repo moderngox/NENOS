@@ -75,12 +75,13 @@ export async function updateBookBeats(db: D1Database, bookId: string, beats: Sto
   const now = new Date().toISOString();
   await db
     .prepare(
-      `UPDATE books SET pages = ?, front_cover = ?, back_cover = ?, status = ?, updated_at = ? WHERE id = ?`
+      `UPDATE books SET pages = ?, front_cover = ?, back_cover = ?, cast_sheet = ?, status = ?, updated_at = ? WHERE id = ?`
     )
     .bind(
       JSON.stringify(beats.pages),
       JSON.stringify(beats.frontCover),
       JSON.stringify(beats.backCover),
+      JSON.stringify(beats.castSheet),
       "beats_ready",
       now,
       bookId
@@ -107,6 +108,7 @@ interface BookRow {
   pages: string | null;
   front_cover: string | null;
   back_cover: string | null;
+  cast_sheet: string | null;
   preview_status: string;
   preview_assets: string | null;
   payment_status: string;
@@ -141,7 +143,16 @@ function mapRowToStoredBook(row: BookRow): StoredBook {
 
   const story: StoryBeatsResult | null =
     row.pages && row.front_cover && row.back_cover
-      ? { pages: JSON.parse(row.pages), frontCover: JSON.parse(row.front_cover), backCover: JSON.parse(row.back_cover) }
+      ? {
+          pages: JSON.parse(row.pages),
+          frontCover: JSON.parse(row.front_cover),
+          backCover: JSON.parse(row.back_cover),
+          // Nullable for any book whose beats were generated before this
+          // column existed (pre-migration rows, or in-flight generations
+          // across the deploy) — never let a missing cast sheet break
+          // reading an otherwise-normal book.
+          castSheet: row.cast_sheet ? JSON.parse(row.cast_sheet) : [],
+        }
       : null;
 
   return {

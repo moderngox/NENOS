@@ -130,7 +130,13 @@ export async function handleGeneratePreview(bookId: string, env: Env): Promise<R
 
     const coverBytes = await generateImage({
       apiKey: env.OPENAI_API_KEY,
-      prompt: buildFrontCoverPrompt({ universe, style: book.draft.style, secondaryCharacters: book.draft.secondaryCharacters, photoRefIndex }),
+      prompt: buildFrontCoverPrompt({
+        universe,
+        style: book.draft.style,
+        secondaryCharacters: book.draft.secondaryCharacters,
+        castSheet: book.story.castSheet,
+        photoRefIndex,
+      }),
       images: referenceImages,
       size: PAGE_SIZE,
       quality: PREVIEW_QUALITY,
@@ -147,6 +153,7 @@ export async function handleGeneratePreview(bookId: string, env: Env): Promise<R
         pageCount: book.story.pages.length,
         style: book.draft.style,
         secondaryCharacters: book.draft.secondaryCharacters,
+        castSheet: book.story.castSheet,
         photoRefIndex,
       }),
       images: referenceImages,
