@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
 import { AuthForm } from '../components/AuthForm';
 
 export function Login() {
@@ -13,6 +14,8 @@ export function Login() {
       <div className="container" style={{ padding: '48px 22px', maxWidth: 420, margin: '0 auto' }}>
         <AuthForm returnTo={returnTo} onSuccess={() => navigate(returnTo)} />
       </div>
+
+      <Footer />
     </div>
   );
 }

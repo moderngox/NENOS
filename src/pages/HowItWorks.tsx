@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
 import { useLanguage } from '../context/LanguageContext';
 import heroChild from '../assets/hero-child.png';
 import coverFr from '../assets/cover-fr.png';
@@ -103,6 +104,8 @@ export function HowItWorks() {
           </Link>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

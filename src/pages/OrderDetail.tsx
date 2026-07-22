@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
 import { useLanguage } from '../context/LanguageContext';
 
 interface OrderDetailData {
@@ -151,6 +152,8 @@ export function OrderDetail() {
           </>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

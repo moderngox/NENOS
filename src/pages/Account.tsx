@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
 import { BackButton } from '../components/BackButton';
 import { KidProfileCard } from '../components/KidProfileCard';
+import { DeleteAccountModal } from '../components/DeleteAccountModal';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -43,6 +45,7 @@ export function Account() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tab: Tab = searchParams.get('tab') === 'books' ? 'books' : 'orders';
   const [books, setBooks] = useState<MyBook[] | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -79,6 +82,7 @@ export function Account() {
             {t.auth.login}
           </Link>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -252,7 +256,27 @@ export function Account() {
             ))}
           </div>
         )}
+
+        <div style={{ marginTop: 40, paddingTop: 20, borderTop: '1px solid var(--border)', textAlign: 'right' }}>
+          <button
+            type="button"
+            onClick={() => setDeleteModalOpen(true)}
+            style={{ background: 'none', border: 'none', font: '600 12px Geist', color: 'var(--muted)', cursor: 'pointer', padding: 0 }}
+          >
+            {t.account.deleteAccountCta}
+          </button>
+        </div>
       </div>
+
+      {deleteModalOpen && user && (
+        <DeleteAccountModal
+          email={user.email}
+          onClose={() => setDeleteModalOpen(false)}
+          onDeleted={() => navigate('/')}
+        />
+      )}
+
+      <Footer />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { handleGenerateNext } from "./routes/generate-next";
 import { handleBuildPdfNext } from "./routes/build-pdf-next";
 import { handleGetBookStatus } from "./routes/book-status";
 import { handleGetPdf } from "./routes/pdf";
-import { handleSignup, handleLogin, handleLogout, handleMe } from "./routes/auth";
+import { handleSignup, handleLogin, handleLogout, handleMe, handleDeleteAccount } from "./routes/auth";
 import { handleGetMyBooks } from "./routes/me-books";
 import { handleGetMyProfile } from "./routes/me-profile";
 import { handleGetOrderDetail } from "./routes/order-detail";
@@ -75,6 +75,9 @@ export default {
     }
     if (url.pathname === "/api/me" && request.method === "GET") {
       return handleMe(request, env);
+    }
+    if (url.pathname === "/api/me" && request.method === "DELETE") {
+      return handleDeleteAccount(request, env);
     }
     if (url.pathname === "/api/me/books" && request.method === "GET") {
       return handleGetMyBooks(request, env);

@@ -30,6 +30,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => Promise<void>;
+  deleteAccount: (confirmation: string) => Promise<void>;
   loginWithGoogle: (returnTo?: string) => void;
   loginWithFacebook: (returnTo?: string) => void;
   refresh: () => Promise<void>;
@@ -118,6 +119,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       logout: async () => {
         await fetch('/api/auth/logout', { method: 'POST' });
+        setUser(null);
+        setProfile(null);
+      },
+      deleteAccount: async (confirmation) => {
+        const response = await fetch('/api/me', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ confirmation }),
+        });
+        if (!response.ok) throw new Error(await parseJsonError(response));
         setUser(null);
         setProfile(null);
       },

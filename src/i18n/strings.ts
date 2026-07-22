@@ -234,6 +234,14 @@ export interface Strings {
     preparing: (done: number, total: number) => string;
     pdfPreparing: string;
     logout: string;
+    deleteAccountCta: string;
+    deleteAccountModalTitle: string;
+    deleteAccountModalWarning: string;
+    deleteAccountTypeDeleteLabel: string;
+    deleteAccountTypeEmailLabel: (email: string) => string;
+    deleteAccountConfirmCta: string;
+    deleteAccountCancelCta: string;
+    deleteAccountError: string;
   };
   kidProfile: {
     sectionTitle: string;
@@ -650,6 +658,15 @@ export const fr: Strings = {
     preparing: (done, total) => `En préparation — ${done}/${total}`,
     pdfPreparing: 'PDF en préparation…',
     logout: 'Se déconnecter',
+    deleteAccountCta: 'Supprimer mon compte',
+    deleteAccountModalTitle: 'Supprimer définitivement votre compte ?',
+    deleteAccountModalWarning:
+      'Cette action est irréversible : votre compte, vos livres, vos avatars et toutes les images générées seront définitivement supprimés.',
+    deleteAccountTypeDeleteLabel: 'Écrivez « DELETE » pour confirmer',
+    deleteAccountTypeEmailLabel: (email) => `Écrivez votre email (${email}) pour confirmer`,
+    deleteAccountConfirmCta: 'Supprimer définitivement mon compte',
+    deleteAccountCancelCta: 'Annuler',
+    deleteAccountError: 'La suppression a échoué. Réessayez.',
   },
   kidProfile: {
     sectionTitle: 'Mon héros',
@@ -1065,6 +1082,14 @@ export const en: Strings = {
     preparing: (done, total) => `Preparing — ${done}/${total}`,
     pdfPreparing: 'Preparing PDF…',
     logout: 'Log out',
+    deleteAccountCta: 'Delete my account',
+    deleteAccountModalTitle: 'Permanently delete your account?',
+    deleteAccountModalWarning: 'This is irreversible: your account, books, avatars, and all generated images will be permanently deleted.',
+    deleteAccountTypeDeleteLabel: 'Type "DELETE" to confirm',
+    deleteAccountTypeEmailLabel: (email) => `Type your email (${email}) to confirm`,
+    deleteAccountConfirmCta: 'Permanently delete my account',
+    deleteAccountCancelCta: 'Cancel',
+    deleteAccountError: 'Deletion failed. Please try again.',
   },
   kidProfile: {
     sectionTitle: 'My hero',
