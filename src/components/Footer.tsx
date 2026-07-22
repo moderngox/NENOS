@@ -9,7 +9,7 @@ export function Footer() {
       }}
     >
       <span style={{ font: '600 12px Geist', color: 'var(--muted)' }}>
-        NENOS {new Date().getFullYear()} by MODERN GOX
+        © {new Date().getFullYear()} NENOS by MODERN GOX
       </span>
     </footer>
   );
