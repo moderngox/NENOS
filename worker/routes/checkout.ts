@@ -1,6 +1,7 @@
-import { getBook, markBookCheckoutStarted, stampBookUser } from "../db";
+import { getBook, markBookCheckoutStarted, markBookPayPalCheckoutStarted, stampBookUser } from "../db";
 import { getSessionUser } from "../auth";
 import { PRICES_CENTS } from "../pricing";
+import { createPayPalOrder } from "../paypal";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -70,4 +71,49 @@ export async function handleCreateCheckout(bookId: string, request: Request, env
 
   await markBookCheckoutStarted(env.DB, bookId, format, session.id);
   return jsonResponse({ url: session.url });
+}
+
+// Parallel to handleCreateCheckout, using PayPal Orders v2 instead of
+// Stripe Checkout — same deferred authorize-now/capture-later model (see
+// worker/paypal.ts). The customer approves on PayPal's hosted page, then
+// PayPal redirects to our own /api/books/:id/paypal-return (not directly
+// back into the SPA) so we can do the server-side "authorize" call before
+// continuing to the same /commande-confirmee flow Stripe's success_url
+// already uses.
+export async function handleCreatePayPalCheckout(bookId: string, request: Request, env: Env): Promise<Response> {
+  const user = await getSessionUser(request, env);
+  if (!user) return jsonResponse({ error: "You need to be signed in to complete your order." }, 401);
+
+  const book = await getBook(env.DB, bookId);
+  if (!book) return jsonResponse({ error: "Book not found." }, 404);
+
+  await stampBookUser(env.DB, bookId, user.id);
+
+  let format: string;
+  try {
+    const body = (await request.json()) as { format?: string };
+    format = body.format === "digital" ? "digital" : "print";
+  } catch {
+    return jsonResponse({ error: "Expected a JSON body with a format field." }, 400);
+  }
+
+  const amountCents = PRICES_CENTS[format];
+  const origin = new URL(request.url).origin;
+  const description = book.story?.frontCover.title || `Livre personnalisé — ${book.draft.name}`;
+
+  let order: { orderId: string; approveUrl: string };
+  try {
+    order = await createPayPalOrder(env, {
+      bookId,
+      amountCents,
+      description,
+      returnUrl: `${origin}/api/books/${bookId}/paypal-return`,
+      cancelUrl: `${origin}/paiement`,
+    });
+  } catch (err) {
+    return jsonResponse({ error: `PayPal error: ${(err as Error).message}` }, 502);
+  }
+
+  await markBookPayPalCheckoutStarted(env.DB, bookId, format, order.orderId);
+  return jsonResponse({ url: order.approveUrl });
 }

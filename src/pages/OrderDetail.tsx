@@ -13,6 +13,7 @@ interface OrderDetailData {
   priceCents: number | null;
   paymentStatus: string;
   paymentUnlocked: boolean;
+  paymentProvider: string;
   card: { brand: string; last4: string } | null;
   fullStatus: string;
   fullUnitsDone: number;
@@ -113,7 +114,13 @@ export function OrderDetail() {
               <Row label={t.orderDetail.paymentStatusLabel} value={statusLabel(order.paymentStatus)} />
               <Row
                 label={t.orderDetail.cardLabel}
-                value={order.card ? t.orderDetail.cardValue(capitalize(order.card.brand), order.card.last4) : t.orderDetail.noCardInfo}
+                value={
+                  order.paymentProvider === 'paypal'
+                    ? t.orderDetail.paypalValue
+                    : order.card
+                      ? t.orderDetail.cardValue(capitalize(order.card.brand), order.card.last4)
+                      : t.orderDetail.noCardInfo
+                }
               />
               <Row
                 label={t.orderDetail.bookStatusLabel}

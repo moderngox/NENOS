@@ -44,7 +44,9 @@
 	// derive an origin from). Overridden to http://localhost:8787 in
 	// .dev.vars for local runs.
 	"vars": {
-		"APP_BASE_URL": "https://nenos23.moderngox.workers.dev"
+		"APP_BASE_URL": "https://nenos23.moderngox.workers.dev",
+		// Overridden to the sandbox API base in .dev.vars for local runs.
+		"PAYPAL_API_BASE": "https://api-m.paypal.com"
 	},
 	// Drives full-book generation forward once a minute regardless of
 	// whether any browser tab is open — see worker/scheduled.ts. Available

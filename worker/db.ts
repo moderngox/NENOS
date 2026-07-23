@@ -118,6 +118,9 @@ interface BookRow {
   pdf_units_done: number;
   user_id: string | null;
   stripe_payment_intent_id: string | null;
+  payment_provider: string | null;
+  paypal_order_id: string | null;
+  paypal_authorization_id: string | null;
   format: string | null;
   kind: string;
   avatar_status: string;
@@ -170,6 +173,12 @@ function mapRowToStoredBook(row: BookRow): StoredBook {
     pdfUnitsDone: row.pdf_units_done,
     userId: row.user_id,
     stripePaymentIntentId: row.stripe_payment_intent_id,
+    // NULL on any book created before PayPal support shipped — treated as
+    // implicitly 'stripe' by every reader of this field (worker/scheduled.ts,
+    // order-detail routes), never requiring a data backfill.
+    paymentProvider: row.payment_provider,
+    paypalOrderId: row.paypal_order_id,
+    paypalAuthorizationId: row.paypal_authorization_id,
     format: row.format,
     kind: row.kind,
     avatarStatus: row.avatar_status,
@@ -224,6 +233,24 @@ export async function markBookCheckoutStarted(
     .run();
 }
 
+// Parallel to markBookCheckoutStarted, for the PayPal checkout path
+// (worker/routes/checkout.ts's handleCreatePayPalCheckout) — sets
+// payment_provider so downstream code (worker/scheduled.ts's
+// captureAndNotify, order-detail card/payment-method display) knows which
+// provider's API to call for this book.
+export async function markBookPayPalCheckoutStarted(
+  db: D1Database,
+  bookId: string,
+  format: string,
+  paypalOrderId: string
+): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare(`UPDATE books SET format = ?, payment_provider = 'paypal', paypal_order_id = ?, updated_at = ? WHERE id = ?`)
+    .bind(format, paypalOrderId, now, bookId)
+    .run();
+}
+
 // Checkout completed — the card is authorized (held), not yet charged.
 // Generation is unlocked from this point (see auth.ts's isPaymentUnlocked);
 // the actual charge happens later, once the book is ready (see db.ts's
@@ -233,6 +260,18 @@ export async function markBookAuthorized(db: D1Database, bookId: string, payment
   await db
     .prepare(`UPDATE books SET payment_status = 'authorized', stripe_payment_intent_id = ?, updated_at = ? WHERE id = ?`)
     .bind(paymentIntentId, now, bookId)
+    .run();
+}
+
+// Parallel to markBookAuthorized, for the PayPal return-URL handler
+// (worker/routes/paypal-checkout.ts) — called right after the server-side
+// PayPal "authorize" call succeeds, the PayPal equivalent of Stripe's
+// webhook-confirmed authorization.
+export async function markBookPayPalAuthorized(db: D1Database, bookId: string, authorizationId: string): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare(`UPDATE books SET payment_status = 'authorized', payment_provider = 'paypal', paypal_authorization_id = ?, updated_at = ? WHERE id = ?`)
+    .bind(authorizationId, now, bookId)
     .run();
 }
 

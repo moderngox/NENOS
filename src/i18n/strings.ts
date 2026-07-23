@@ -177,6 +177,7 @@ export interface Strings {
     deliveryValue: string;
     total: string;
     cta: string;
+    ctaPaypal: string;
     security: string;
     redirecting: string;
     error: string;
@@ -284,6 +285,7 @@ export interface Strings {
     cardLabel: string;
     cardValue: (brand: string, last4: string) => string;
     noCardInfo: string;
+    paypalValue: string;
     bookStatusLabel: string;
     bookStatusReady: string;
     bookStatusInProgress: (done: number, total: number) => string;
@@ -601,6 +603,7 @@ export const fr: Strings = {
     deliveryValue: 'Offerte',
     total: 'Total',
     cta: 'Payer et recevoir mon livre',
+    ctaPaypal: 'Payer avec PayPal',
     security: '🔒 Paiement sécurisé · satisfait ou remboursé',
     redirecting: 'Redirection vers le paiement sécurisé...',
     error: 'Le paiement n’a pas pu démarrer. Réessaie.',
@@ -709,6 +712,7 @@ export const fr: Strings = {
     cardLabel: 'Moyen de paiement',
     cardValue: (brand, last4) => `${brand} •••• ${last4}`,
     noCardInfo: 'Non disponible',
+    paypalValue: 'PayPal',
     bookStatusLabel: 'Statut du livre',
     bookStatusReady: '✓ Prêt',
     bookStatusInProgress: (done, total) => `En préparation — ${done}/${total}`,
@@ -1025,6 +1029,7 @@ export const en: Strings = {
     deliveryValue: 'Free',
     total: 'Total',
     cta: 'Pay and receive my book',
+    ctaPaypal: 'Pay with PayPal',
     security: '🔒 Secure payment · money-back guarantee',
     redirecting: 'Redirecting to secure payment...',
     error: 'Payment could not start. Please try again.',
@@ -1132,6 +1137,7 @@ export const en: Strings = {
     cardLabel: 'Payment method',
     cardValue: (brand, last4) => `${brand} •••• ${last4}`,
     noCardInfo: 'Not available',
+    paypalValue: 'PayPal',
     bookStatusLabel: 'Book status',
     bookStatusReady: '✓ Ready',
     bookStatusInProgress: (done, total) => `Preparing — ${done}/${total}`,

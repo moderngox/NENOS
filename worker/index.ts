@@ -1,7 +1,8 @@
 import { handleCreateBook } from "./routes/books";
 import { handleGeneratePreview } from "./routes/preview";
 import { handleGetAsset, handleGetFullAsset } from "./routes/assets";
-import { handleCreateCheckout } from "./routes/checkout";
+import { handleCreateCheckout, handleCreatePayPalCheckout } from "./routes/checkout";
+import { handlePayPalReturn } from "./routes/paypal-checkout";
 import { handleStripeWebhook } from "./routes/stripe-webhook";
 import { handleGenerateNext } from "./routes/generate-next";
 import { handleBuildPdfNext } from "./routes/build-pdf-next";
@@ -22,7 +23,7 @@ import { handleGetAdminCustomerDetail } from "./routes/admin/customer-detail";
 import { handleGetAdminOrders } from "./routes/admin/orders";
 import { handleGetAdminOrderDetail } from "./routes/admin/order-detail";
 import { handleGetAdminGenerationHealth } from "./routes/admin/generation-health";
-import { handleRetryGeneration, handleRetryPdf, handleResendReadyEmail } from "./routes/admin/actions";
+import { handleRetryGeneration, handleRetryPdf, handleResendReadyEmail, handleRegenerateBook } from "./routes/admin/actions";
 
 export default {
   async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
@@ -111,11 +112,12 @@ export default {
     if (parts.length === 4 && parts[0] === "api" && parts[1] === "admin" && parts[2] === "orders" && request.method === "GET") {
       return handleGetAdminOrderDetail(parts[3], request, env);
     }
-    // /api/admin/books/:id/retry-generation | retry-pdf | resend-ready-email
+    // /api/admin/books/:id/retry-generation | retry-pdf | resend-ready-email | regenerate
     if (parts.length === 5 && parts[0] === "api" && parts[1] === "admin" && parts[2] === "books" && request.method === "POST") {
       if (parts[4] === "retry-generation") return handleRetryGeneration(parts[3], request, env);
       if (parts[4] === "retry-pdf") return handleRetryPdf(parts[3], request, env);
       if (parts[4] === "resend-ready-email") return handleResendReadyEmail(parts[3], request, env);
+      if (parts[4] === "regenerate") return handleRegenerateBook(parts[3], request, env);
     }
 
     // /api/auth/:provider/start and /api/auth/:provider/callback
@@ -139,6 +141,16 @@ export default {
       return handleCreateCheckout(parts[2], request, env);
     }
 
+    // /api/books/:id/checkout-paypal
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "books" && parts[3] === "checkout-paypal" && request.method === "POST") {
+      return handleCreatePayPalCheckout(parts[2], request, env);
+    }
+
+    // /api/books/:id/paypal-return — PayPal redirects the browser here after approval
+    if (parts.length === 4 && parts[0] === "api" && parts[1] === "books" && parts[3] === "paypal-return" && request.method === "GET") {
+      return handlePayPalReturn(parts[2], request, env);
+    }
+
     // /api/books/:id/generate-next
     if (parts.length === 4 && parts[0] === "api" && parts[1] === "books" && parts[3] === "generate-next" && request.method === "POST") {
       return handleGenerateNext(parts[2], env);
@@ -151,12 +163,12 @@ export default {
 
     // /api/books/:id/assets/:filename
     if (parts.length === 5 && parts[0] === "api" && parts[1] === "books" && parts[3] === "assets" && request.method === "GET") {
-      return handleGetAsset(parts[2], parts[4], env);
+      return handleGetAsset(parts[2], parts[4], env, request);
     }
 
     // /api/books/:id/full-assets/:filename
     if (parts.length === 5 && parts[0] === "api" && parts[1] === "books" && parts[3] === "full-assets" && request.method === "GET") {
-      return handleGetFullAsset(parts[2], parts[4], env);
+      return handleGetFullAsset(parts[2], parts[4], env, request);
     }
 
     // /api/books/:id/pdf

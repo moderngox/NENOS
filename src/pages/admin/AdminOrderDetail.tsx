@@ -15,8 +15,10 @@ interface AdminOrder {
   format: string | null;
   priceCents: number | null;
   paymentStatus: string;
+  paymentProvider: string;
   stripeStatus: string | null;
   stripePaymentIntentId: string | null;
+  paypalAuthorizationId: string | null;
   card: { brand: string; last4: string } | null;
   previewStatus: string;
   avatarStatus: string | null;
@@ -68,6 +70,17 @@ export function AdminOrderDetail() {
     }
   };
 
+  const handleRegenerate = () => {
+    if (
+      !window.confirm(
+        'Regenerate the entire book? This rewrites the story and every image from scratch (real OpenAI cost) and overwrites what the customer currently has. This cannot be undone.'
+      )
+    ) {
+      return;
+    }
+    runAction('regenerate');
+  };
+
   return (
     <div style={{ maxWidth: 560 }}>
       <Link to="/admin/orders" style={{ font: '700 13px Geist', color: 'var(--muted)', display: 'inline-block', marginBottom: 20 }}>
@@ -105,8 +118,12 @@ export function AdminOrderDetail() {
             {order.format && <Row label="Format" value={order.format} />}
             {order.priceCents != null && <Row label="Price" value={formatPriceCents(order.priceCents)} />}
             <Row label="Payment" value={<PillBadge pill={paymentStatusPill(order.paymentStatus)} />} />
+            <Row label="Payment method" value={order.paymentProvider === 'paypal' ? 'PayPal' : 'Stripe'} />
             {order.stripeStatus && <Row label="Stripe status" value={order.stripeStatus} />}
-            <Row label="Card" value={order.card ? `${capitalize(order.card.brand)} •••• ${order.card.last4}` : '—'} />
+            <Row
+              label="Card"
+              value={order.paymentProvider === 'paypal' ? 'N/A (PayPal)' : order.card ? `${capitalize(order.card.brand)} •••• ${order.card.last4}` : '—'}
+            />
             <Row label="Preview" value={order.previewStatus} />
             {order.avatarStatus && <Row label="Avatar" value={order.avatarStatus} />}
             <Row label="Full generation" value={order.fullStatus === 'ready' ? 'Ready' : `${order.fullStatus} (${order.fullUnitsDone}/${order.fullUnitsTotal})`} />
@@ -118,7 +135,7 @@ export function AdminOrderDetail() {
           </div>
 
           {(order.fullStatus === 'ready' || order.pdfStatus === 'ready') && (
-            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
               {order.fullStatus === 'ready' && (
                 <Link to={`/livre/${order.bookId}`} target="_blank" rel="noreferrer" className="cta-secondary" style={{ flex: 1, textAlign: 'center', textDecoration: 'none' }}>
                   Read book
@@ -130,6 +147,27 @@ export function AdminOrderDetail() {
                 </a>
               )}
             </div>
+          )}
+
+          {order.fullStatus !== 'generating' && (
+            <button
+              type="button"
+              disabled={actionBusy}
+              onClick={handleRegenerate}
+              style={{
+                width: '100%',
+                font: '700 13px Geist',
+                color: '#b3261e',
+                background: '#fff',
+                border: '1px solid #f3b9b4',
+                borderRadius: 12,
+                padding: '13px 0',
+                marginBottom: 16,
+                cursor: actionBusy ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Regenerate entire book (new story + all images)
+            </button>
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>

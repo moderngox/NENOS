@@ -23,18 +23,19 @@ export function Payment() {
     sessionStorage.removeItem('nenos_preferred_format');
     return preferred === 'digital' ? 'digital' : 'print';
   });
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState<'stripe' | 'paypal' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handlePay = async () => {
+  const handlePay = async (provider: 'stripe' | 'paypal') => {
     if (!story) {
       setError(t.payment.error);
       return;
     }
     setError(null);
-    setSubmitting(true);
+    setSubmitting(provider);
     try {
-      const response = await fetch(`/api/books/${story.bookId}/checkout`, {
+      const endpoint = provider === 'paypal' ? 'checkout-paypal' : 'checkout';
+      const response = await fetch(`/api/books/${story.bookId}/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ format }),
@@ -46,7 +47,7 @@ export function Payment() {
       window.location.href = body.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
-      setSubmitting(false);
+      setSubmitting(null);
     }
   };
 
@@ -159,8 +160,17 @@ export function Payment() {
           {user ? (
             <>
               <p style={{ font: '600 12px Geist', color: 'var(--muted)', marginBottom: 10 }}>{t.auth.loggedInAs(user.email)}</p>
-              <button type="button" className="cta" style={{ marginBottom: 10 }} onClick={handlePay} disabled={submitting}>
-                {submitting ? t.payment.redirecting : t.payment.cta}
+              <button type="button" className="cta" style={{ marginBottom: 10 }} onClick={() => handlePay('stripe')} disabled={submitting !== null}>
+                {submitting === 'stripe' ? t.payment.redirecting : t.payment.cta}
+              </button>
+              <button
+                type="button"
+                className="cta-secondary"
+                style={{ marginBottom: 10, width: '100%' }}
+                onClick={() => handlePay('paypal')}
+                disabled={submitting !== null}
+              >
+                {submitting === 'paypal' ? t.payment.redirecting : t.payment.ctaPaypal}
               </button>
               {error && (
                 <p style={{ textAlign: 'center', font: '600 12px Geist', color: 'var(--red, #d33)', margin: '0 0 10px' }}>{error}</p>

@@ -15,6 +15,11 @@ interface Env {
   FACEBOOK_APP_ID: string;
   FACEBOOK_APP_SECRET: string;
   RESEND_API_KEY: string;
+  PAYPAL_CLIENT_ID: string;
+  PAYPAL_CLIENT_SECRET: string;
+  // "https://api-m.sandbox.paypal.com" for local dev, "https://api-m.paypal.com"
+  // in production — see worker/paypal.ts.
+  PAYPAL_API_BASE: string;
 }
 
 // *.ttf module typing (for the "Data" rule in wrangler.jsonc) is

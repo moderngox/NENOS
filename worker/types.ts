@@ -98,6 +98,11 @@ export interface StoredBook {
   pdfUnitsDone: number;
   userId: string | null;
   stripePaymentIntentId: string | null;
+  // NULL means 'stripe' (implicitly, for every book created before PayPal
+  // support shipped) — see worker/db.ts's mapRowToStoredBook.
+  paymentProvider: string | null;
+  paypalOrderId: string | null;
+  paypalAuthorizationId: string | null;
   format: string | null;
   // 'book' — a real (potentially purchasable) storybook, the default.
   // 'avatar' — a free, standalone hero-avatar creation (name/age/traits/

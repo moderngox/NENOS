@@ -45,9 +45,12 @@ export async function handleGetOrderDetail(bookId: string, request: Request, env
   if (!book) return jsonResponse({ error: "Order not found." }, 404);
   if (book.userId !== user.id) return jsonResponse({ error: "Order not found." }, 404);
 
-  const { card, stripeStatus } = book.stripePaymentIntentId
-    ? await fetchCardInfo(env, book.stripePaymentIntentId)
-    : { card: null, stripeStatus: null };
+  // PayPal doesn't reliably expose card brand/last4 the way Stripe does
+  // (depends on how the buyer funded the payment) — not worth chasing
+  // parity; the customer just sees "Paid via PayPal" instead of a card.
+  const isPayPal = book.paymentProvider === "paypal";
+  const { card, stripeStatus } =
+    !isPayPal && book.stripePaymentIntentId ? await fetchCardInfo(env, book.stripePaymentIntentId) : { card: null, stripeStatus: null };
 
   const pageCount = book.story?.pages.length ?? 10;
 
@@ -60,6 +63,7 @@ export async function handleGetOrderDetail(bookId: string, request: Request, env
     priceCents: book.format ? PRICES_CENTS[book.format] ?? null : null,
     paymentStatus: book.paymentStatus,
     paymentUnlocked: isPaymentUnlocked(book.paymentStatus),
+    paymentProvider: isPayPal ? "paypal" : "stripe",
     stripeStatus,
     card,
     fullStatus: book.fullStatus,

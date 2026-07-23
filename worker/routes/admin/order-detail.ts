@@ -13,9 +13,9 @@ export async function handleGetAdminOrderDetail(bookId: string, request: Request
 
   const customer = book.userId ? await getUserById(env.DB, book.userId) : null;
 
-  const { card, stripeStatus } = book.stripePaymentIntentId
-    ? await fetchCardInfo(env, book.stripePaymentIntentId)
-    : { card: null, stripeStatus: null };
+  const isPayPal = book.paymentProvider === "paypal";
+  const { card, stripeStatus } =
+    !isPayPal && book.stripePaymentIntentId ? await fetchCardInfo(env, book.stripePaymentIntentId) : { card: null, stripeStatus: null };
 
   const pageCount = book.story?.pages.length ?? 10;
 
@@ -36,8 +36,10 @@ export async function handleGetAdminOrderDetail(bookId: string, request: Request
     format: book.format,
     priceCents: book.format ? PRICES_CENTS[book.format] ?? null : null,
     paymentStatus: book.paymentStatus,
+    paymentProvider: isPayPal ? "paypal" : "stripe",
     stripeStatus,
     stripePaymentIntentId: book.stripePaymentIntentId,
+    paypalAuthorizationId: book.paypalAuthorizationId,
     card,
     previewStatus: book.previewStatus,
     avatarStatus: book.avatarStatus,

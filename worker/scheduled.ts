@@ -3,6 +3,7 @@ import { getUserById } from "./users-db";
 import { generateNextUnit } from "./routes/generate-next";
 import { buildPdfNextUnit } from "./routes/build-pdf-next";
 import { sendEmail, bookReadyEmailHtml, adminBookReadyEmailHtml, ADMIN_EMAIL } from "./email";
+import { capturePayPalAuthorization } from "./paypal";
 
 // Bounds how much work one cron tick takes on — each unit is a real,
 // billed, 3-4 minute OpenAI call, so this keeps a single scheduled
@@ -24,17 +25,35 @@ async function captureStripePayment(env: Env, paymentIntentId: string): Promise<
 
 async function captureAndNotify(bookId: string, env: Env): Promise<void> {
   const book = await getBook(env.DB, bookId);
-  if (!book || !book.stripePaymentIntentId) return;
+  if (!book) return;
 
-  const captured = await captureStripePayment(env, book.stripePaymentIntentId);
-  if (captured) {
-    await markBookCaptured(env.DB, bookId);
+  // NULL payment_provider means 'stripe' (every book created before PayPal
+  // support existed) — see worker/db.ts's mapRowToStoredBook.
+  const isPayPal = book.paymentProvider === "paypal";
+  const providerId = isPayPal ? book.paypalAuthorizationId : book.stripePaymentIntentId;
+  if (!providerId) return;
+
+  // Admin "regenerate entire book" (worker/routes/admin/actions.ts) resets
+  // full_status on a book that's already `captured` — the customer was
+  // already charged once, so this must not call the provider's capture
+  // endpoint a second time (both Stripe's PaymentIntent and PayPal's
+  // authorization can only be captured once; a second call errors and
+  // would wrongly flip a successful charge to capture_failed). Only
+  // genuinely uncaptured states attempt a capture.
+  let captured: boolean;
+  if (book.paymentStatus === "captured") {
+    captured = true;
   } else {
-    // The book is already generated (real cost incurred) and stays
-    // reachable — this just flags the charge itself needs manual
-    // follow-up. Surfaced to the admin dashboard's order detail page and
-    // via the admin "book ready" email below (captureSucceeded: false).
-    await markBookCaptureFailed(env.DB, bookId);
+    captured = isPayPal ? await capturePayPalAuthorization(env, providerId) : await captureStripePayment(env, providerId);
+    if (captured) {
+      await markBookCaptured(env.DB, bookId);
+    } else {
+      // The book is already generated (real cost incurred) and stays
+      // reachable — this just flags the charge itself needs manual
+      // follow-up. Surfaced to the admin dashboard's order detail page and
+      // via the admin "book ready" email below (captureSucceeded: false).
+      await markBookCaptureFailed(env.DB, bookId);
+    }
   }
 
   const bookTitle = book.story?.frontCover.title ?? book.draft.name;
@@ -66,8 +85,13 @@ async function captureAndNotify(bookId: string, env: Env): Promise<void> {
 }
 
 export async function handleScheduled(env: Env): Promise<void> {
+  // Ordinarily a 'captured'/'capture_failed' book already has
+  // full_status='ready' (capture only ever happens once generation
+  // finishes, right below) — including them here only matters for the one
+  // case that isn't true: an admin "regenerate entire book" action
+  // deliberately resets full_status back to 'none' on an already-paid book.
   const { results } = await env.DB.prepare(
-    `SELECT id FROM books WHERE payment_status = 'authorized' AND full_status != 'ready' ORDER BY updated_at ASC LIMIT ?`
+    `SELECT id FROM books WHERE payment_status IN ('authorized', 'captured', 'capture_failed') AND full_status != 'ready' ORDER BY updated_at ASC LIMIT ?`
   )
     .bind(MAX_BOOKS_PER_TICK)
     .all<{ id: string }>();
