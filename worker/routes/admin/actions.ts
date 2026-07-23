@@ -1,6 +1,7 @@
-import { getBook, updateFullProgress, updatePdfProgress } from "../../db";
+import { getBook, updateFullProgress, updatePdfProgress, updateBookBeats } from "../../db";
 import { getUserById } from "../../users-db";
 import { sendEmail, bookReadyEmailHtml } from "../../email";
+import { generateStoryBeats } from "../../story-beats";
 import { STALE_LOCK_MS as FULL_STALE_LOCK_MS } from "../generate-next";
 import { STALE_LOCK_MS as PDF_STALE_LOCK_MS } from "../build-pdf-next";
 import { requireAdmin, jsonResponse } from "./guard";
@@ -63,4 +64,34 @@ export async function handleResendReadyEmail(bookId: string, request: Request, e
   });
 
   return jsonResponse({ ok: true, message: "Email resent." });
+}
+
+// Rewrites the story from scratch — a fresh GPT-4o completion against the
+// same stored draft, which also produces a fresh castSheet (see
+// worker/story-beats.ts) for books generated before that existed — then
+// resets both full and PDF progress to "none"/0 so the existing cron/
+// client-poll pipeline (generate-next.ts, build-pdf-next.ts) regenerates
+// every image and rebuilds the PDF against the new story. Real OpenAI cost
+// (one chat completion, then up to ~26 image generations) — deliberately
+// admin-only, not exposed to customers.
+export async function handleRegenerateBook(bookId: string, request: Request, env: Env): Promise<Response> {
+  const admin = await requireAdmin(request, env);
+  if (admin instanceof Response) return admin;
+
+  const book = await getBook(env.DB, bookId);
+  if (!book) return jsonResponse({ error: "Book not found." }, 404);
+  if (book.kind !== "book") return jsonResponse({ error: "Only full books can be regenerated." }, 409);
+
+  let beats;
+  try {
+    beats = await generateStoryBeats(env.OPENAI_API_KEY, book.draft);
+  } catch (err) {
+    return jsonResponse({ error: `Story regeneration failed: ${(err as Error).message}` }, 502);
+  }
+
+  await updateBookBeats(env.DB, bookId, beats);
+  await updateFullProgress(env.DB, bookId, "none", 0);
+  await updatePdfProgress(env.DB, bookId, "none", 0);
+
+  return jsonResponse({ ok: true, message: "Regeneration queued — a fresh story and all images will rebuild over the next few minutes." });
 }
